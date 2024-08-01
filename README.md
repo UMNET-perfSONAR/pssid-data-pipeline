@@ -80,7 +80,70 @@ OPTIONAL: you could also start the opensearch dashboard in the same way.
 docker-compose -f <path-to-opensearch-dashboard.yml> up -d
 ```
 
+By default, `Logstash` listens for `Filebeat` input at port 9400, `Opensearch`
+listens for `Logstash` input at port 9200, `Grafana` dashboard is hosted at
+port 3000, and the optional `Opensearch` dashboard is hosted at port 5601.
+Make sure the firewall settings allow external traffic to ports 9400, 3000, and
+5601.
+
 ## Usage
 ### `logstash.conf`
+This file contains the input source, custom filters, and output destination. See the
+sample file for more details. The input and output fields generally require minimal
+changes, if any. Most of the customization is done in the `filter` field. You could
+implement as many filters as you like, and a more complicated filtering at the
+Logstash level usually results in simpler configuration later at the Grafana level.
+
+The sample file contains a single pipeline with multiple filters applied. Refer
+to the
+<a href="https://www.elastic.co/guide/en/logstash/current/configuration-advanced.html">official documentation</a> for more advanced examples with multiple pipelines.
+
 ### Filebeat
+**On each WiFi probe**, install `Filebeat`. Refer to the documentation
+<a href="https://www.elastic.co/guide/en/beats/filebeat/current/setup-repositories.html">here</a>.
+
+Then open the configuration file `/etc/filebeat/filebeat.yml` and edit the following
+fields.
+
+Specify the input source for `Filebeat`, which is the output destination of pSSID.
+In the following example, test results gathered by pSSID are written to
+`/var/log/pssid.log` on the probe.
+```
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/pssid.log
+```
+
+Comment out the output section for `Elasticsearch` and uncomment the one for
+`Logstash`.
+```
+output.logstash:
+  hosts: ["<pipeline-hostname>:9400"]
+```
+
 ### Grafana
+Naviagte to the `Grafana` dashboard at `<pipeline-hostname>:3000`. By default,
+`Grafana` username and password are both `admin`. To add a data source, select
+`Opensearch` in the list of available sources and configure as follows.
+<img src="images/add-data-source.png" alt="add-data-source"></img>
+Remarks:
+* `URL`: use https instead of http, and check `Basic auth` and `Skip TLS Verify`
+under the `Auth` section. `User` and `Password` under `Basic Auth Details` are
+`OPENSEARCH_USER` and `OPENSEARCH_PASSWORD` defined earlier, which are `admin` and
+`OpensearchInit2024` in our example. Also make sure to use the Docker aliased
+hostname `opensearch-node1` instead of the actual hostname of your pipeline machine.
+* `Index name`: wild card patterns are allowed here. To see the list of all
+`Opensearch` indices, run
+```
+curl -u <OPENSEARCH_USER>:<OPENSEARCH_PASSWORD> --insecure \
+    "https://localhost:9200/_cat/indices?v"
+```
+on the pipeline machine.
+* Click on `Get Version and Save`, which should automatically populate the `Version`
+and `Max concurrent Shard Requests` fields, indicating a successful configuration.
+
+Having configured the data sources, now you could create visualization panels and
+dashboards.
+<img src="images/visualization-example.png" alt="visualization-example"></img>
