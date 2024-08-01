@@ -1,0 +1,40 @@
+# This is my .gitignore file.
+
+# MacOS system files
+*.DS_Store
+
+# XCode files
+xcuserdata/
+project.xcworkspace/xcuserdata/
+DerivedData/
+*.pbxuser
+*.mode1v3
+DerivedData/
+build/
+*.dSYM/
+
+# Output files
+*.out
+
+# Compile object files and executables
+*.o
+*.exe
+*.app
+
+# Python virtual environment
+env/
+
+# Python cached files.
+__pycache__/
+
+# Temporary files.
+tmp/
+
+# Playground.
+demo.py
+
+# Log files.
+*.log
+
+# Markdown preview file
+.markdown-preview.html
