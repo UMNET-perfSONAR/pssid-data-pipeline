@@ -14,7 +14,9 @@ services:
       # minimum and maximum Java heap size,
       # recommend setting both to 50% of system RAM
       - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=OpensearchInit2024
+      # TODO: add your initial admin password here. Using an environment variable is
+      # recommended. Hardcoding is fine on a closed machine.
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=<YOUR_PASSWORD>
     ulimits:
       memlock:
         soft: -1

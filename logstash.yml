@@ -1,16 +1,18 @@
 version: '3'
 services:
   logstash:
-    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.16.2
+    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:latest
     container_name: logstash
     user: root
     volumes:
-      - /home/wmarcoyu/logstash-pipeline:/usr/share/logstash/pipeline
+      # TODO: mount your pipeline directory into the container. USE ABSOLUTE PATH!
+      - <ABS_PATH_TO_YOUR_PIPELINE_DIRECTORY>:/usr/share/logstash/pipeline
     ports:
       - 9400:9400
     environment:
-      OPENSEARCH_USER: admin
-      OPENSEARCH_PASSWORD: OpensearchInit2024
+      # TODO: set your opensearch username and password here.
+      - OPENSEARCH_USER=<YOUR_USERNAME>
+      - OPENSEARCH_PASSWORD=<YOUR_PASSWORD>
     command: logstash -f /usr/share/logstash/pipeline/logstash.conf
     networks:
       - opensearch-net
