@@ -15,4 +15,4 @@ services:
 networks:
   opensearch-net:
     external:
-      name: docker-composes_opensearch-net
+      name: pssid-data-pipeline_opensearch-net
