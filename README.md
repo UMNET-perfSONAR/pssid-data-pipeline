@@ -141,4 +141,6 @@ and `Max concurrent Shard Requests` fields, indicating a successful configuratio
 
 Having configured the data sources, now you could create visualization panels and
 dashboards.
+<p align="center">
 <img src="images/visualization-example.png" alt="visualization-example"></img>
+</p>
