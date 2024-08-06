@@ -34,35 +34,30 @@ export OPENSEARCH_INITIAL_ADMIN_PASSWORD=OpensearchInit2024
 export OPENSEARCH_USER=admin
 export OPENSEARCH_PASSWORD=OpensearchInit2024
 ```
+:warning: These variables are consumed by `opensearch-one-node.yml` and
+`logstash.yml`, so it is not recommended that you change the variable names unless
+there is a good reason. You could freely change their values.
 
-Open `opensearch-one-node.yml` and edit the TODO item.
+Don't forget to run
 ```
-# TODO: add your initial admin password here. Using an environment variable is
-# recommended. Hardcoding is fine if on a closed machine.
-- OPENSEARCH_INITIAL_ADMIN_PASSWORD=<YOUR_PASSWORD>
+source ~/.bashrc
 ```
+to load the environment variables.
 
 3. Configure `Logstash`. Create a directory on the host machine,
 say `logstash-pipeline`, with at least a
 `logstash.conf` file in it. `logstash.conf` contains input, output sources, and
 custom filters you would like to implement. A sample file is provided inside the
-directory `logstash-pipeline`.
+directory `logstash-pipeline`. You could use it as your pipeline directory and add
+more `.conf` files to it.
 
-Open `logstash.yml` and edit the following TODO items.
+Open `logstash.yml` and edit the following TODO item.
 
-First mount the directory you just created to the `pipeline` directory inside the
+Mount the directory you just created to the `pipeline` directory inside the
 container.
 ```
 # TODO: mount your pipeline directory into the container. USE ABSOLUTE PATH!
 - <ABS_PATH_TO_YOUR_PIPELINE_DIRECTORY>:/usr/share/logstash/pipeline
-```
-
-Then set the username and password for access to `Opensearch` as the ones
-defined earlier.
-```
-# TODO: set your opensearch username and password here.
-- OPENSEARCH_USER=<YOUR_USERNAME>
-- OPENSEARCH_PASSWORD=<YOUR_PASSWORD>
 ```
 
 4. No configuration is required for `Grafana`.

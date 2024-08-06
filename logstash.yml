@@ -10,9 +10,8 @@ services:
     ports:
       - 9400:9400
     environment:
-      # TODO: set your opensearch username and password here.
-      - OPENSEARCH_USER=<YOUR_USERNAME>
-      - OPENSEARCH_PASSWORD=<YOUR_PASSWORD>
+      - OPENSEARCH_USER=${OPENSEARCH_USER}
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}
     command: logstash -f /usr/share/logstash/pipeline/logstash.conf
     networks:
       - opensearch-net
