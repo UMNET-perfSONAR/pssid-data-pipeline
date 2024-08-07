@@ -44,6 +44,16 @@ source ~/.bashrc
 ```
 to load the environment variables.
 
+:warning::warning:
+Note that this approach with environment variables requires that you do not
+run `docker-compose` with `sudo`, since the root user cannot read the
+environment variables defined by non-root users. Make sure the current user is in
+the `docker` group so that you can directly run `docker-compose` without `sudo`.
+Add yourself to the `docker` group and activate it by running the following command.
+```
+sudo usermod -aG docker ${USER} && newgrp docker
+```
+
 3. Configure `Logstash`. Create a directory on the host machine,
 say `logstash-pipeline`, with at least a
 `logstash.conf` file in it. `logstash.conf` contains input, output sources, and
