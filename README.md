@@ -54,6 +54,17 @@ Add yourself to the `docker` group and activate it by running the following comm
 sudo usermod -aG docker ${USER} && newgrp docker
 ```
 
+:warning::warning:`Opensearch` requires `vm.max_map_count` to be at least 262144.
+Check your current value by running
+```
+sysctl vm.max_map_count
+```
+and if it is too low, say 65530 by default on some machine, edit the
+`/etc/sysctl.conf` file and add the following
+```
+vm.max_map_count=262144
+```
+
 3. Configure `Logstash`. Create a directory on the host machine,
 say `logstash-pipeline`, with at least a
 `logstash.conf` file in it. `logstash.conf` contains input, output sources, and
