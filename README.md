@@ -17,7 +17,10 @@ and `Grafana`, resepctively.
 
 ## Requirements
 The setup of the pipeline assumes that you have a virtual machine running Ubuntu 22
-and that the machine has Docker installed.
+and that the machine has Docker installed. If not, you could install it with
+```
+sudo apt update && sudo apt install docker.io docker-compose -y
+```
 
 ## Installation
 1. Clone this repository to the machine you would like to host the pipeline on. Each
