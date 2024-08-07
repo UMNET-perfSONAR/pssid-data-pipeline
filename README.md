@@ -64,6 +64,10 @@ and if it is too low, say 65530 by default on some machine, edit the
 ```
 vm.max_map_count=262144
 ```
+Apply the change
+```
+sudo sysctl -p
+```
 
 3. Configure `Logstash`. Create a directory on the host machine,
 say `logstash-pipeline`, with at least a
