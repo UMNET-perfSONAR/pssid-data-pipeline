@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EntityDescriptor  xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" xmlns:req-attr="urn:oasis:names:tc:SAML:protocol:ext:req-attr" entityID="https://shibboleth.umich.edu/idp/shibboleth">
+
+    <Extensions xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute">
+      <mdattr:EntityAttributes xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+       <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" Name="environment">
+          <saml:AttributeValue>prod</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue>https://github.com/umich-iam/shibboleth-umich-federation/raw/master/category/prod.md</saml:AttributeValue>
+      </saml:Attribute>
+      </mdattr:EntityAttributes>
+    </Extensions>
+
+    <IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+
+        <Extensions>
+            <shibmd:Scope regexp="false">umich.edu</shibmd:Scope>
+            <shibmd:Scope regexp="false">annarbor.umich.edu</shibmd:Scope>
+            <shibmd:Scope regexp="false">umd.umich.edu</shibmd:Scope>
+            <shibmd:Scope regexp="false">dearborn.umich.edu</shibmd:Scope>
+            <shibmd:Scope regexp="false">flint.umich.edu</shibmd:Scope>
+            <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
+                <mdui:DisplayName xml:lang="en">University of Michigan</mdui:DisplayName>
+                <mdui:Description xml:lang="en">The University of Michigan</mdui:Description>
+                <mdui:InformationURL xml:lang="en">https://umich.edu/</mdui:InformationURL>
+                <mdui:PrivacyStatementURL xml:lang="en">https://it.umich.edu/security-privacy</mdui:PrivacyStatementURL>
+                <mdui:Logo height="150" width="150" xml:lang="en">https://shibboleth.umich.edu/images/logo.png</mdui:Logo>
+            </mdui:UIInfo>
+        </Extensions>
+
+        <KeyDescriptor use="signing">
+            <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>MIIDPDCCAiSgAwIBAgIVAKTsnSoDNC7AuF7I0MFTRrakT8UzMA0GCSqGSIb3DQEB
+BQUAMB8xHTAbBgNVBAMTFHNoaWJib2xldGgudW1pY2guZWR1MB4XDTA5MDMyNTE0
+MzcwMVoXDTI5MDMyNTE0MzcwMVowHzEdMBsGA1UEAxMUc2hpYmJvbGV0aC51bWlj
+aC5lZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDhtn+rMsZLQXwO
+SGUnB4+S4lfo9UAvenGskm74puRzGBO9UB5QxPn8LIkHEloafvlWuYKOf8yVqFom
+/q+odD7wl+M66z0E+d0Ci5P2pw2ZaREymG6JMLg7kHuuXWKuxOZPsLcExFqqroF5
+p1NTVaNAT2F27+NXuTabW/p09Tn2H2FPnWhtaZ9PzFfj2Y7SRSPWxp/6KdPZ/rlv
+y9FVIpojwh0uQxPz/un22XMu7W+sw49vBKa4xgHv1TTrMIi83fMElEE4NVQuQc0X
+uT7J29+b+BRQnXLYvIbxJWVrSxXZIbgAirNaW3DYNocH3LweQSXSLOAmFlIMvJ5L
+bMa5BvhDAgMBAAGjbzBtMEwGA1UdEQRFMEOCFHNoaWJib2xldGgudW1pY2guZWR1
+hitodHRwczovL3NoaWJib2xldGgudW1pY2guZWR1L2lkcC9zaGliYm9sZXRoMB0G
+A1UdDgQWBBS99cFe6MAQ+FC7bKXUVybdWHsAFjANBgkqhkiG9w0BAQUFAAOCAQEA
+jqQuqBLJLw6OtPVs0V3ZPU/q09qzxpU4GWx+h/GCuex6oVYJmgXweK8vJd7R/pW1
+1LbspeQU1NIsO19k1YF8TZlhqYzbx4PQoDwMYsvl98NN9J1MdMt0I0tx23bT3egP
+WDGivFjtUra8t0VXjVu7opsRcd125wNBLglpk2tu7i7la87BzUDXpidX60KimfaC
+JZUi4F4cCLgSEdoliyfSn2Whqwbm2AGfH+77tyFMI2ZhKa9nmskThwmK12Y6ElnS
+9LmVd8q6AjVB3HnwguPOQjs9UBcxb9eeYwhhgUl11nyEmpvIUmYlGKLT/+ghVmTM
+6e4eBYMhFygzksi2hS6UIw==</ds:X509Certificate>
+                    </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>
+
+        <KeyDescriptor use="encryption">
+            <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>MIIDPDCCAiSgAwIBAgIVAM8TM5Ha6Czir5/UXyi7jOaIDHTjMA0GCSqGSIb3DQEB
+CwUAMB8xHTAbBgNVBAMMFHNoaWJib2xldGgudW1pY2guZWR1MB4XDTE1MDkwOTE2
+MzczM1oXDTM1MDkwOTE2MzczM1owHzEdMBsGA1UEAwwUc2hpYmJvbGV0aC51bWlj
+aC5lZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDhwgg8rer6Sb8Q
+0h1TW3yBLRuGHNuBgnqBmYpOIAPvZMmVd7E5Uy7+/5TQ/fmVxONyPqGfwZ30OQ10
+tjh1x7N98+fkBVUgddIz9+/mejGoa8t1oJfgFNCODkRnNBW4KCZ6vgul5K9dp1DD
+IbAxaPnfihoKNbs2rrRPZCnE1m5qA9BNERI3oAmx3TUDY9Q+KSgxfafNeV4R2V9l
+r3Q1C2+DaTTRFT1r9Z6zfwBgluUnEWetw6kd/Mr07MpHeZXteRe8/30KYm7jdFr4
+YQT3Hw4Rrs0gVujDCJeUzPBc2oCm3Q4LkCYej83ORK7aVMai3h5d1sJ+i2Ae6+tq
+naR9xHxTAgMBAAGjbzBtMB0GA1UdDgQWBBSSOHMt6RMXaIzRomwpU7hxQPVrdjBM
+BgNVHREERTBDghRzaGliYm9sZXRoLnVtaWNoLmVkdYYraHR0cHM6Ly9zaGliYm9s
+ZXRoLnVtaWNoLmVkdS9pZHAvc2hpYmJvbGV0aDANBgkqhkiG9w0BAQsFAAOCAQEA
+d+u9xmOSiofg71PGm+NNvcLjUdIfwts8jrN3fz8HC0vBt80Ok5aBLQHDYv8yYTZG
+hjzFHAQKT20yAv4RgMVhyjoSGRY3j5KGiVbr1UJjsmg6zdfzKhNYvwsWpPYu1KQB
+uxK+YXfCRnBtD3PpxfIL4vhjtNI7ZYSzssJ7ywz9sj5dfoJxqClxaJkqUtwVcvT9
+wTlnxaUonkQ1GueeBZiMTvu7gK/LJUANGRk/hxcSjkdQX/VN6rCf/WvcBbBK1tEw
+tFW3a4T+V/Meg8o1/M3rmyaBJOnjRQWtU8YabPgkifoFh585EU3hpD/9sRrAB9Z9
+mw/4tAnwG/Jud63/M46a9w==</ds:X509Certificate>
+                    </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>
+
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://shibboleth.umich.edu/idp/profile/SAML2/POST-SimpleSign/SLO"/>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://shibboleth.umich.edu/idp/profile/SAML2/Redirect/SLO"/>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://shibboleth.umich.edu/idp/profile/SAML2/POST/SLO"/>
+
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" req-attr:supportsRequestedAttributes="true" Location="https://shibboleth.umich.edu/idp/profile/SAML2/POST/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" req-attr:supportsRequestedAttributes="true" Location="https://shibboleth.umich.edu/idp/profile/SAML2/POST-SimpleSign/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" req-attr:supportsRequestedAttributes="true" Location="https://shibboleth.umich.edu/idp/profile/SAML2/Redirect/SSO"/>
+        <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://shibboleth.umich.edu/idp/profile/Shibboleth/SSO"/>
+    </IDPSSODescriptor>
+
+    <Organization>
+        <OrganizationName xml:lang="en">University of Michigan</OrganizationName>
+        <OrganizationDisplayName xml:lang="en">University of Michigan</OrganizationDisplayName>
+        <OrganizationURL xml:lang="en">https://umich.edu/</OrganizationURL>
+    </Organization>
+    <ContactPerson contactType="technical">
+        <GivenName>ITS Identity and Access Management</GivenName>
+        <EmailAddress>shibboleth@umich.edu</EmailAddress>
+    </ContactPerson>
+    <ContactPerson contactType="support">
+        <GivenName>ITS Identity and Access Management</GivenName>
+        <EmailAddress>shibboleth@umich.edu</EmailAddress>
+    </ContactPerson>
+    <ContactPerson xmlns:remd="http://refeds.org/metadata" contactType="other" remd:contactType="http://refeds.org/metadata/contactType/security">
+        <GivenName>ITS Security</GivenName>
+        <EmailAddress>security@umich.edu</EmailAddress>
+    </ContactPerson>
+    <ContactPerson contactType="technical">
+        <GivenName>ITS Identity and Access Management</GivenName>
+        <EmailAddress>shibboleth@umich.edu</EmailAddress>
+    </ContactPerson>
+    <ContactPerson contactType="administrative">
+        <GivenName>ITS Identity and Access Management</GivenName>
+        <EmailAddress>shibboleth@umich.edu</EmailAddress>
+    </ContactPerson>
+
+</EntityDescriptor>

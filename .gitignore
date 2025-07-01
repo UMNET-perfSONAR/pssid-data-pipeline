@@ -36,5 +36,7 @@ demo.py
 # Log files.
 *.log
 
+.env
+
 # Markdown preview file
 .markdown-preview.html

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" 
+                     entityID="https://pssid-metrics.miserver.it.umich.edu">
+  <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" 
+                                 Location="https://pssid-metrics.miserver.it.umich.edu/mellon/postResponse" 
+                                 index="0"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" 
+                                 Location="https://pssid-metrics.miserver.it.umich.edu/mellon/redirectResponse" 
+                                 index="1"/>
+                                 
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" 
+                            Location="https://pssid-metrics.miserver.it.umich.edu/mellon/logout"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" 
+                            Location="https://pssid-metrics.miserver.it.umich.edu/mellon/logout"/>
+  </md:SPSSODescriptor>
+</md:EntityDescriptor>

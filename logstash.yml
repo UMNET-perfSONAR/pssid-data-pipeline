@@ -6,10 +6,11 @@ services:
     user: root
     volumes:
       # TODO: mount your pipeline directory into the container. USE ABSOLUTE PATH!
-      - <ABS_PATH_TO_YOUR_PIPELINE_DIRECTORY>:/usr/share/logstash/pipeline
+      - /home/kayleyg/pssid-data-pipeline/logstash-pipeline:/usr/share/logstash/pipeline
     ports:
       - 9400:9400
     environment:
+      - OPENSEARCH_HOST=${OPENSEARCH_HOST}
       - OPENSEARCH_USER=${OPENSEARCH_USER}
       - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}
     command: logstash -f /usr/share/logstash/pipeline/logstash.conf
