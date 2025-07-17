@@ -8,12 +8,15 @@ services:
       - 3000:3000
     environment:
       - GF_INSTALL_PLUGINS=grafana-opensearch-datasource,esnet-matrix-panel
-      
-      # Disable basic auth and anonymous access
+      - GF_AUTH_GOOGLE_ENABLED=true
+      - GF_AUTH_GOOGLE_CLIENT_ID=client_id
+      - GF_AUTH_GOOGLE_CLIENT_SECRET=secret
+      - GF_AUTH_GOOGLE_ALLOWED_DOMAINS=umich.edu
+      - GF_AUTH_GOOGLE_SCOPES=openid email profile https://www.googleapis.com/auth/cloud-identity.groups.readonly
+      - GF_AUTH_ALLOWED_GROUPS=pssid-gui@umich.edu
+      - GF_AUTH_GOOGLE_ROLE_ATTRIBUTE_PATH=contains(groups[*], 'pssid-gui@umich.edu') && 'Editor' || 'Viewer'
       - GF_AUTH_BASIC_ENABLED=false
       - GF_AUTH_ANONYMOUS_ENABLED=false
-      
-      # SMTP configuration
       - GF_SMTP_ENABLED=true
       - GF_SMTP_HOST=smtp.gmail.com:587
       - GF_SMTP_USER=${GF_SMTP_USER}
@@ -21,52 +24,20 @@ services:
       - GF_SMTP_FROM_ADDRESS=${GF_SMTP_USER}
       - GF_SMTP_FROM_NAME=Grafana
 
-      # Server configuration - behind Apache proxy
-      - GF_SERVER_ROOT_URL=https://pssid-metrics.miserver.it.umich.edu
-      - GF_SERVER_PROTOCOL=http
-      - GF_SERVER_HTTP_PORT=3000
-      
-      # Auth Proxy Configuration
-      - GF_AUTH_PROXY_ENABLED=true
-      - GF_AUTH_PROXY_HEADER_NAME=X-WEBAUTH-USER
-      - GF_AUTH_PROXY_HEADER_PROPERTY=username
-      - GF_AUTH_PROXY_AUTO_SIGN_UP=true
-      - GF_AUTH_PROXY_SYNC_TTL=15
-
-      - GF_AUTH_PROXY_WHITELIST=172.18.0.0/16,172.19.0.0/16,172.20.0.0/16
-      # Additional headers for user attributes
-      - GF_AUTH_PROXY_HEADERS=Name:X-WEBAUTH-NAME Email:X-WEBAUTH-EMAIL Groups:X-WEBAUTH-GROUPS
-      - GF_AUTH_PROXY_ENABLE_LOGIN_TOKEN=false
+      - GF_SERVER_ROOT_URL=http://pssid-metrics.miserver.it.umich.edu:3000
 
     volumes:
       - grafana-data:/var/lib/grafana
+      - /etc/grafana/saml:/etc/grafana/saml
 
     networks:
       - opensearch-net
-      - web
-    restart: always
-
-  apache:
-    build: ./apache-mellon
-    container_name: apache
-    ports:
-      - 443:443
-      - 80:80
-    volumes:
-      - ./mellon-config:/etc/mellon
-      - /etc/letsencrypt:/etc/letsencrypt
-    depends_on:
-      - grafana
-    networks:
-      - web
     restart: always
 
 volumes:
   grafana-data:
 
 networks:
-  web:
-    external: true
   opensearch-net:
     external:
       name: pssid-data-pipeline_opensearch-net

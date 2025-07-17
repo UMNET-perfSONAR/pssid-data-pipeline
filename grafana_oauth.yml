@@ -1,0 +1,101 @@
+version: '3.6'
+
+services:
+  grafana:
+    image: grafana/grafana-oss  # Using Open Source version
+    container_name: grafana
+    user: root  # Run as root to access certificates, or use proper UID
+    ports:
+      - 443:3000  # Grafana HTTPS on port 3000 internally
+      - 80:3000   # Optional: for HTTP redirect
+    environment:
+      # Basic Grafana configuration
+      - GF_INSTALL_PLUGINS=grafana-opensearch-datasource,esnet-matrix-panel
+      
+      # HTTPS Configuration
+      - GF_SERVER_PROTOCOL=https
+      - GF_SERVER_DOMAIN=pssid-metrics.miserver.it.umich.edu
+      - GF_SERVER_ROOT_URL=https://pssid-metrics.miserver.it.umich.edu
+      - GF_SERVER_CERT_FILE=/etc/grafana/grafana.crt
+      - GF_SERVER_CERT_KEY=/etc/grafana/grafana.key
+      - GF_SERVER_ENFORCE_DOMAIN=true
+      
+      # Run Grafana as grafana user after initialization
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD:-admin}
+      
+      # Disable other auth methods
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_DISABLE_LOGIN_FORM=false  # Keep login form as fallback during testing
+      
+      # Enable Generic OAuth
+      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+      - GF_AUTH_GENERIC_OAUTH_NAME=University of Michigan
+      - GF_AUTH_GENERIC_OAUTH_ICON=signin
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=${OIDC_CLIENT_ID}
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email offline_access
+      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://shibboleth.umich.edu/idp/profile/oidc/authorize
+      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://shibboleth.umich.edu/idp/profile/oidc/token
+      - GF_AUTH_GENERIC_OAUTH_API_URL=https://shibboleth.umich.edu/idp/profile/oidc/userinfo
+      - GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP=true
+      - GF_AUTH_GENERIC_OAUTH_AUTO_LOGIN=false  # Set to true if you want automatic redirect to U-M login
+      
+      # Token authentication method
+      - GF_AUTH_GENERIC_OAUTH_AUTH_STYLE=AutoDetect
+      
+      # Attribute mapping
+      - GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH=preferred_username
+      - GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH=name
+      - GF_AUTH_GENERIC_OAUTH_EMAIL_ATTRIBUTE_PATH=email
+      
+      # Role mapping (Open Source doesn't have team sync)
+      # This example gives Editor role to members of pssid-gui group, Viewer to everyone else
+      # - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(edumember_is_member_of[*], 'pssid-gui@umich.edu') && 'Editor' || 'Viewer'
+      
+      # Use refresh tokens
+      - GF_AUTH_GENERIC_OAUTH_USE_REFRESH_TOKEN=true
+      
+      # Sign out redirect
+      - GF_AUTH_GENERIC_OAUTH_SIGNOUT_REDIRECT_URL=https://shibboleth.umich.edu/idp/profile/oidc/logout
+      
+      # Default role for new users
+      - GF_USERS_DEFAULT_ROLE=Viewer
+      - GF_USERS_AUTO_ASSIGN_ORG=true
+      - GF_USERS_AUTO_ASSIGN_ORG_ID=1
+      - GF_USERS_AUTO_ASSIGN_ORG_ROLE=Viewer
+      - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH='Viewer'
+
+      - GF_LOG_FILTERS=auth:debug
+
+      # Security settings
+      - GF_SECURITY_COOKIE_SECURE=true
+      - GF_SECURITY_STRICT_TRANSPORT_SECURITY=true
+      - GF_SECURITY_STRICT_TRANSPORT_SECURITY_MAX_AGE_SECONDS=86400
+      - GF_SECURITY_STRICT_TRANSPORT_SECURITY_PRELOAD=true
+      - GF_SECURITY_STRICT_TRANSPORT_SECURITY_SUBDOMAINS=true
+      
+      # SMTP configuration (optional)
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=smtp.gmail.com:587
+      - GF_SMTP_USER=${GF_SMTP_USER}
+      - GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
+      - GF_SMTP_FROM_ADDRESS=${GF_SMTP_USER}
+      - GF_SMTP_FROM_NAME=Grafana
+
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - /etc/letsencrypt/live/pssid-metrics.miserver.it.umich.edu/fullchain.pem:/etc/grafana/grafana.crt:ro
+      - /etc/letsencrypt/live/pssid-metrics.miserver.it.umich.edu/privkey.pem:/etc/grafana/grafana.key:ro
+    networks:
+      - opensearch-net
+    restart: always
+
+volumes:
+  grafana-data:
+
+networks:
+  opensearch-net:
+    external:
+      name: pssid-data-pipeline_opensearch-net
