@@ -1,3 +1,10 @@
+# NOT CURRENTLY IN USAGE
+# This file is used to configure Grafana with OAuth authentication using U-M's OIDC provider.
+# It is set up to use the Open Source version of Grafana with HTTPS enabled.
+# Ensure you have the necessary certificates and environment variables set up.
+# If you use this file, use it with `docker-compose -f grafana_oauth.yml up`.
+# However, this file is not currently in use. The main configuration is in `grafana.yml`.
+
 version: '3.6'
 
 services:
