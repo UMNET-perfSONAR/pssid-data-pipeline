@@ -9,8 +9,8 @@ services:
     environment:
       - GF_INSTALL_PLUGINS=grafana-opensearch-datasource,esnet-matrix-panel
       - GF_AUTH_GOOGLE_ENABLED=true
-      - GF_AUTH_GOOGLE_CLIENT_ID=client_id
-      - GF_AUTH_GOOGLE_CLIENT_SECRET=secret
+      - GF_AUTH_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GF_AUTH_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GF_AUTH_GOOGLE_ALLOWED_DOMAINS=umich.edu
       - GF_AUTH_GOOGLE_SCOPES=openid email profile https://www.googleapis.com/auth/cloud-identity.groups.readonly
       - GF_AUTH_ALLOWED_GROUPS=pssid-gui@umich.edu
