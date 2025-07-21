@@ -89,9 +89,9 @@ container.
 ```
 
 4. (Optional) Configure Grafana Google SSO and email alerting. (If you would like to skip Google SSO or email alerting, you can respectively comment out the GF_AUTH environmental variables or the GF_SMTP environmmental variables in grafana.yml).
-For SSO: Navigate to <a href="https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/google/"> and follow the steps for obtaining a Google client ID and a client secret. In your .env file (create one if you don't have one), create the variables GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET and save the credentials.
+For SSO: Navigate to <a href="https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/google/"> this link </a>and follow the steps for obtaining a Google client ID and a client secret. In your .env file (create one if you don't have one), create the variables GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET and save the credentials.
 
-For email alerting: Refer to the documentation <a href="https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/"> here</a>. Your SMTP username and from_address will be the email that you want the alerts to be sent from. Please note that this email must have 2FA configured and that SMTP may be disabled if you're using a university email. In this case, use a personal email, but be aware that the initial Grafana alert email will likely go to your spam and you will have to mark that sender as not spam. Reference <a href="https://support.google.com/mail/answer/185833?hl=en">this link</a> for how to set up an app password to use with SMTP: . Save your SMTP credentials in your .env file.
+For email alerting: Refer to the documentation <a href="https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/"> here</a>. Your SMTP username and from_address will be the email that you want the alerts to be sent from. Please note that this email must have 2FA configured and that SMTP may be disabled if you're using a university email. In this case, use a personal email, but be aware that the initial Grafana alert email will likely go to your spam and you will have to mark that sender as not spam. Reference <a href="https://support.google.com/mail/answer/185833?hl=en">this link</a> for how to set up an app password to use with SMTP. Save your SMTP credentials in your .env file.
 
 7. Start the three components of the service with
 `docker-compose`.
@@ -132,7 +132,7 @@ While running the optional OpenSearch dashboard, navigate to '<pipeline-hostname
 
 ### Grafana
 Navigate to the `Grafana` dashboard at `<pipeline-hostname>:3000`. By default,
-`Grafana` username and password are both `admin`. To add a data source, select
+`Grafana` username and password are both `admin`. If you only want to view the dashboard and not edit, and you have Google SSO configured, you can also sign in with your university email. To add a data source, select
 `Opensearch` in the list of available sources and configure as follows.
 <img src="images/add-data-source.png" alt="add-data-source"></img>
 Remarks:
@@ -156,3 +156,5 @@ dashboards.
 
 ### Grafana Visualization
 The exported-grafana-json folder contains the exported json for an example Grafana dashboard. To import this dashboard into Grafana, navigate to Dashboards -> New -> Import and drag and drop the JSON file where prompted.
+
+### Queries on Grafana
