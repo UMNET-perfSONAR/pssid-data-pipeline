@@ -88,15 +88,18 @@ container.
 - <ABS_PATH_TO_YOUR_PIPELINE_DIRECTORY>:/usr/share/logstash/pipeline
 ```
 
-4. No configuration is required for `Grafana`.
+4. (Optional) Configure Grafana Google SSO and email alerting. (If you would like to skip Google SSO or email alerting, you can respectively comment out the GF_AUTH environmental variables or the GF_SMTP environmmental variables in grafana.yml).
+For SSO: Navigate to <a href="https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/google/"> this link </a>and follow the steps for obtaining a Google client ID and a client secret. In your .env file (create one if you don't have one), create the variables GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET and save the credentials.
 
-5. Start the three components of the service with
+For email alerting: Refer to the documentation <a href="https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/"> here</a>. Your SMTP username and from_address will be the email that you want the alerts to be sent from. Please note that this email must have 2FA configured and that SMTP may be disabled if you're using a university email. In this case, use a personal email, but be aware that the initial Grafana alert email will likely go to your spam and you will have to mark that sender as not spam. Reference <a href="https://support.google.com/mail/answer/185833?hl=en">this link</a> for how to set up an app password to use with SMTP. Save your SMTP credentials in your .env file.
+
+7. Start the three components of the service with
 `docker-compose`.
 
 ```
 docker-compose -f <path-to-opensearch.yml> up -d
 docker-compose -f <path-to-logstash.yml> up -d
-docker-compose -f <path-to-grafana.yml> up -d
+docker-compose -f <path-to-grafana.yml> --env-file .env up -d
 ```
 OPTIONAL: you could also start the opensearch dashboard in the same way.
 ```
@@ -110,45 +113,26 @@ Make sure the firewall settings allow external traffic to ports 9400, 3000, and
 5601.
 
 ## Usage
-### `logstash.conf`
+### Filebeat
+Use the Ansible playbook <a href="https://github.com/UMNET-perfSONAR/ansible-playbook-filebeat">here</a> and follow the instructions to install Filebeat onto a list of probes. Ensure that the machine you clone the Ansible playbook to has SSH access to each probe on the list. The role that this playbook deploys can be found <a href="https://github.com/UMNET-perfSONAR/ansible-role-filebeat">here</a>.
+
+If any changes need to be made to the Filebeat configuration, edit the Jinja2 template inside the role. This can be accomplished by cloning the role inside the playbook directory and directly editing templates/filebeat.yml.j2, without having to publish the role to Ansible Galaxy.
+
+### logstash.conf
 This file contains the input source, custom filters, and output destination. See the
 sample file for more details. The input and output fields generally require minimal
 changes, if any. Most of the customization is done in the `filter` field. You could
 implement as many filters as you like, and a more complicated filtering at the
 Logstash level usually results in simpler configuration later at the Grafana level.
 
-The sample file contains a single pipeline with multiple filters applied. Refer
-to the
-<a href="https://www.elastic.co/guide/en/logstash/current/configuration-advanced.html">official documentation</a> for more advanced examples with multiple pipelines.
+Ruby scripts for parsing the JSON, converting the durations, and normalizing the endpoints were sourced from <a href="https://github.com/perfsonar/logstash/tree/master/perfsonar-logstash/perfsonar-logstash">here</a>.
 
-### Filebeat
-**On each WiFi probe**, install `Filebeat`. Refer to the documentation
-<a href="https://www.elastic.co/guide/en/beats/filebeat/current/setup-repositories.html">here</a>.
-
-Then open the configuration file `/etc/filebeat/filebeat.yml` and edit the following
-fields.
-
-Specify the input source for `Filebeat`, which is the output destination of pSSID.
-In the following example, test results gathered by pSSID are written to
-`/var/log/pssid.log` on the probe.
-```
-filebeat.inputs:
-- type: log
-  enabled: true
-  paths:
-    - /var/log/pssid.log
-```
-
-Comment out the output section for `Elasticsearch` and uncomment the one for
-`Logstash`.
-```
-output.logstash:
-  hosts: ["<pipeline-hostname>:9400"]
-```
+### OpenSearch Dashboard
+While running the optional OpenSearch dashboard, navigate to '<pipeline-hostname>:5601' and sign in when prompted. This documentation uses `admin` as the username and `OpensearchInit2024` as the password for demonstration. The most important functionality of the dashboard is checking the indices that Logstash is generating, as well as the JSON format of the data within each index. To use the dashboard for this purpose, navigate to 'Dev Tools' in the sidebar and type GET <index-name-here>/_search. 
 
 ### Grafana
-Naviagte to the `Grafana` dashboard at `<pipeline-hostname>:3000`. By default,
-`Grafana` username and password are both `admin`. To add a data source, select
+Navigate to the `Grafana` dashboard at `<pipeline-hostname>:3000`. By default,
+`Grafana` username and password are both `admin`. If you only want to view the dashboard and not edit, and you have Google SSO configured, you can also sign in with your university email. To add a data source, select
 `Opensearch` in the list of available sources and configure as follows.
 <img src="images/add-data-source.png" alt="add-data-source"></img>
 Remarks:
@@ -169,6 +153,8 @@ and `Max concurrent Shard Requests` fields, indicating a successful configuratio
 
 Having configured the data sources, now you could create visualization panels and
 dashboards.
-<p align="center">
-<img src="images/visualization-example.png" alt="visualization-example"></img>
-</p>
+
+### Grafana Visualization
+The exported-grafana-json folder contains the exported json for an example Grafana dashboard. To import this dashboard into Grafana, navigate to Dashboards -> New -> Import and drag and drop the JSON file where prompted.
+
+### Queries on Grafana
