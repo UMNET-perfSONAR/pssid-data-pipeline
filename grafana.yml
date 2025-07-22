@@ -13,8 +13,6 @@ services:
       - GF_AUTH_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GF_AUTH_GOOGLE_ALLOWED_DOMAINS=umich.edu
       - GF_AUTH_GOOGLE_SCOPES=openid email profile https://www.googleapis.com/auth/cloud-identity.groups.readonly
-      - GF_AUTH_ALLOWED_GROUPS=pssid-gui@umich.edu
-      - GF_AUTH_GOOGLE_ROLE_ATTRIBUTE_PATH=contains(groups[*], 'pssid-gui@umich.edu') && 'Editor' || 'Viewer'
       - GF_AUTH_BASIC_ENABLED=false
       - GF_AUTH_ANONYMOUS_ENABLED=false
       - GF_SMTP_ENABLED=true
