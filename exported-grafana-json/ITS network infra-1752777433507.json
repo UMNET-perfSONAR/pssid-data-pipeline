@@ -198,6 +198,7 @@
         "type": "grafana-opensearch-datasource",
         "uid": "cepck5jtcc45cc"
       },
+      "description": "dest: $destination",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -298,7 +299,7 @@
               "type": "count"
             }
           ],
-          "query": "SOURCE = `pscheduler_throughput_${host}_${ssid}`\n| EVAL  timestamp       =  @timestamp\n| EVAL  throughput_bits =  result.throughput\n| FIELDS timestamp, throughput_bits\n| SORT   +timestamp",
+          "query": "SOURCE = `pscheduler_throughput_${host}_${ssid}_${host}_${destination}`\n| EVAL  timestamp       =  @timestamp\n| EVAL  throughput_bits =  result.throughput\n| FIELDS timestamp, throughput_bits\n| SORT   +timestamp",
           "queryType": "PPL",
           "refId": "A",
           "timeField": "@timestamp"
@@ -315,7 +316,7 @@
           "type": "math"
         }
       ],
-      "title": "throughput mbits $host $ssid",
+      "title": "throughput mbits $host $ssid to $destination",
       "type": "timeseries"
     },
     {
@@ -795,19 +796,19 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "response time (ms)",
+            "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 25,
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
-            "insertNulls": 600000,
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -815,7 +816,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": 600000,
+            "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -852,7 +853,7 @@
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "right",
+          "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
@@ -1032,12 +1033,10 @@
         "allowCustomValue": false,
         "current": {
           "text": [
-            "198.111.226.182",
-            "198.111.226.190"
+            "198.111.226.182"
           ],
           "value": [
-            "198.111.226.182",
-            "198.111.226.190"
+            "198.111.226.182"
           ]
         },
         "includeAll": false,
@@ -1050,7 +1049,7 @@
             "value": "198.111.226.182"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "198.111.226.190",
             "value": "198.111.226.190"
           },
@@ -1063,16 +1062,21 @@
             "selected": false,
             "text": "198.111.226.159",
             "value": "198.111.226.159"
+          },
+          {
+            "selected": false,
+            "text": "*",
+            "value": "*"
           }
         ],
-        "query": "198.111.226.182, 198.111.226.190, 198.111.226.184, 198.111.226.159",
+        "query": "198.111.226.182, 198.111.226.190, 198.111.226.184, 198.111.226.159, *",
         "type": "custom"
       },
       {
         "allowCustomValue": false,
         "current": {
-          "text": "eduroam",
-          "value": "eduroam"
+          "text": "",
+          "value": ""
         },
         "name": "ssid",
         "options": [
@@ -1082,12 +1086,43 @@
             "value": "mwireless"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "eduroam",
             "value": "eduroam"
+          },
+          {
+            "selected": false,
+            "text": "*",
+            "value": "*"
           }
         ],
-        "query": "mwireless, eduroam",
+        "query": "mwireless, eduroam, *",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": "perfsonar-bin-seb.umnet.umich.edu",
+          "value": "perfsonar-bin-seb.umnet.umich.edu"
+        },
+        "name": "destination",
+        "options": [
+          {
+            "selected": true,
+            "text": "perfsonar-bin-seb.umnet.umich.edu",
+            "value": "perfsonar-bin-seb.umnet.umich.edu"
+          },
+          {
+            "selected": false,
+            "text": "perfsonar-core-cool.umnet.umich.edu",
+            "value": "perfsonar-core-cool.umnet.umich.edu"
+          },
+          {
+            "selected": false,
+            "text": "*",
+            "value": "*"
+          }
+        ],
+        "query": "perfsonar-bin-seb.umnet.umich.edu, perfsonar-core-cool.umnet.umich.edu, *",
         "type": "custom"
       }
     ]
@@ -1100,5 +1135,5 @@
   "timezone": "browser",
   "title": "ITS network infra",
   "uid": "627ffd5d-1072-4916-b11f-9a44d0f0277e",
-  "version": 76
+  "version": 90
 }
