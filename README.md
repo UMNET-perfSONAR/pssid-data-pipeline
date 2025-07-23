@@ -88,10 +88,39 @@ container.
 - <ABS_PATH_TO_YOUR_PIPELINE_DIRECTORY>:/usr/share/logstash/pipeline
 ```
 
-4. (Optional) Configure Grafana Google SSO and email alerting. (If you would like to skip Google SSO or email alerting, you can respectively comment out the GF_AUTH environmental variables or the GF_SMTP environmmental variables in grafana.yml).
-For SSO: Navigate to <a href="https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/google/"> this link </a>and follow the steps for obtaining a Google client ID and a client secret. In your .env file (create one if you don't have one), create the variables GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET and save the credentials.
+4. (Optional) Configure Grafana Google SSO and email alerting. 
+You can optionally enable Single Sign-On (SSO) with Google and configure email alerting for Grafana alerts.  
+To disable either feature, comment out the corresponding environment variables in `grafana.yml`:
 
-For email alerting: Refer to the documentation <a href="https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/"> here</a>. Your SMTP username and from_address will be the email that you want the alerts to be sent from. Please note that this email must have 2FA configured and that SMTP may be disabled if you're using a university email. In this case, use a personal email, but be aware that the initial Grafana alert email will likely go to your spam and you will have to mark that sender as not spam. Reference <a href="https://support.google.com/mail/answer/185833?hl=en">this link</a> for how to set up an app password to use with SMTP. Save your SMTP credentials in your .env file.
+| Feature        | Variables to Comment Out          |
+|----------------|-----------------------------------|
+| Google SSO     | `GF_AUTH_*`                       |
+| Email Alerting | `GF_SMTP_*`                       |
+
+---
+
+---
+
+#### Google SSO Configuration
+
+1. **Register your application with Google**
+
+   Follow Grafana’s official documentation to obtain a **Google Client ID** and **Client Secret**:  
+   👉 [Configure Google Authentication in Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/google/)
+
+2. **Create or edit your `.env` file**
+
+   Add the following variables:
+
+   ```env
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+#### Email Alerting through SMTP
+
+**Follow this Grafana tutorial to configure email alerts**
+Refer to the documentation <a href="https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/"> here</a>. Your SMTP username and from_address will be the email that you want the alerts to be sent from. 
+*Note that this email must have 2FA configured and that SMTP may be disabled if you're using a university email.* Here's <a href="https://support.google.com/mail/answer/185833?hl=en">a guide</a> for how to set up an app password to use with SMTP. Save your SMTP credentials in your .env file.
 
 7. Start the three components of the service with
 `docker-compose`.
