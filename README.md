@@ -1,189 +1,177 @@
 # pSSID Data Analytics Pipeline
-A data analytics pipeline for pSSID that receives, stores, and visualizes WiFi
-test metrics gathered by Raspberry Pi WiFi probes.
+
+A data analytics pipeline for pSSID that receives, stores, and visualizes WiFi test metrics gathered by Raspberry Pi WiFi probes.
 
 <p align="center">
 <img src="images/data-pipeline-selected.png" alt="data-pipeline-selected" width="45%"></img>
 <img src="images/data-pipeline-architecture.png" alt="data-pipeline-architecture" width="45%"></img>
 </p>
 
-Picture on the left is an overview of the entire pSSID architecture with the
-role of this data analytics pipeline highlighted. In short, it receives test results
-(metrics) gathered by the probes, stores and visualizes them.
+**Left image:** Overview of the entire pSSID architecture with the data analytics pipeline highlighted. The pipeline receives test results (metrics) from probes, stores them, and provides visualization.
 
-Picture on the right is the architecture of the pipeline itself. It leverages the
-idea of the ELK stack, simply replacing `Elasticsearch` and `Kibana` with `Opensearch`
-and `Grafana`, resepctively.
+**Right image:** Architecture of the pipeline itself, leveraging the ELK stack concept with `Opensearch` replacing `Elasticsearch` and `Grafana` replacing `Kibana`.
 
-## Requirements
-The setup of the pipeline assumes that you have a virtual machine running Ubuntu 22
-and that the machine has Docker installed. If not, you could install it with
-```
+## 📋 Requirements
+
+- Ubuntu 22 virtual machine
+- Docker and Docker Compose installed
+
+### Installing Docker (if needed)
+```bash
 sudo apt update && sudo apt install docker.io docker-compose -y
 ```
 
-## Installation
-1. Clone this repository to the machine you would like to host the pipeline on. Each
-service has its own `docker-compose` file for better modularization. If demand
-changes, say you need more `Opensearch` nodes, you could simply provision more nodes
-without touching other components of the pipeline.
+## 🚀 Installation
 
-2. Set passwords for `Opensearch`, which is required since version 2.12.0.
-The easiest way to do so is with environment variables. Add the following lines to
-your `.bashrc` file. This documentation uses `admin` as the username
-and `OpensearchInit2024` as the password for demonstration.
-```
+### Step 1: Clone the Repository
+Clone this repository to your host machine. Each service has its own `docker-compose` file for better modularization, so when you scale, you could simply provision more nodes
+without touching other components of the pipeline. 
+
+### Step 2: Configure OpenSearch Security
+OpenSearch requires passwords since version 2.12.0. Set up environment variables by adding these lines to your `.bashrc` file (this documentation uses `admin` as the username and `OpensearchInit2024` as the password for demonstration),
+
+```bash
 export OPENSEARCH_INITIAL_ADMIN_PASSWORD=OpensearchInit2024
 export OPENSEARCH_USER=admin
 export OPENSEARCH_PASSWORD=OpensearchInit2024
 ```
-:warning: These variables are consumed by `opensearch-one-node.yml` and
-`logstash.yml`, so it is not recommended that you change the variable names unless
-there is a good reason. You could freely change their values.
 
-Don't forget to run
-```
+> ⚠️ **Note:** These variable names are used by `opensearch-one-node.yml` and `logstash.yml`. You can freely change their values, but do not edit names unless for a good reason.
+
+Then reload the environment variables:
+```bash
 source ~/.bashrc
 ```
-to load the environment variables.
 
-:warning::warning:
-Note that this approach with environment variables requires that you do not
-run `docker-compose` with `sudo`, since the root user cannot read the
-environment variables defined by non-root users. Make sure the current user is in
-the `docker` group so that you can directly run `docker-compose` without `sudo`.
-Add yourself to the `docker` group and activate it by running the following command.
-```
+### Step 3: Configure Docker Permissions
+Add your user to the docker group to avoid using `sudo` (since the root user cannot read the environment variables defined by non-root users):
+```bash
 sudo usermod -aG docker ${USER} && newgrp docker
 ```
 
-:warning::warning:`Opensearch` requires `vm.max_map_count` to be at least 262144.
-Check your current value by running
-```
+> ⚠️ **Important:** Running with `sudo` prevents access to user environment variables.
+
+### Step 4: Set System Requirements
+OpenSearch requires `vm.max_map_count` of at least 262144.
+
+Check current value:
+```bash
 sysctl vm.max_map_count
 ```
-and if it is too low, say 65530 by default on some machine, edit the
-`/etc/sysctl.conf` file and add the following
+
+If it's too low, edit `/etc/sysctl.conf` and add:
 ```
 vm.max_map_count=262144
 ```
-Apply the change
-```
+
+Apply changes:
+```bash
 sudo sysctl -p
 ```
 
-3. Configure `Logstash`. Create a directory on the host machine,
-say `logstash-pipeline`, with at least a
-`logstash.conf` file in it. `logstash.conf` contains input, output sources, and
-custom filters you would like to implement. A sample file is provided inside the
-directory `logstash-pipeline`. You could use it as your pipeline directory and add
-more `.conf` files to it.
+### Step 5: Configure Logstash
+1. Create a `logstash-pipeline` directory with a `logstash.conf` file
+2. Use the provided sample configuration in the `logstash-pipeline` directory as a starting point
+3. Edit `logstash.yml` to mount your pipeline directory:
 
-Open `logstash.yml` and edit the following TODO item.
-
-Mount the directory you just created to the `pipeline` directory inside the
-container.
-```
+```yaml
 # TODO: mount your pipeline directory into the container. USE ABSOLUTE PATH!
 - <ABS_PATH_TO_YOUR_PIPELINE_DIRECTORY>:/usr/share/logstash/pipeline
 ```
 
-4. (Optional) Configure Grafana Google SSO and email alerting. 
-You can optionally enable Single Sign-On (SSO) with Google and configure email alerting for Grafana alerts.  
-To disable either feature, comment out the corresponding environment variables in `grafana.yml`:
+### Step 6: (Optional) Configure Grafana Authentication and Alerting
 
-| Feature        | Variables to Comment Out          |
-|----------------|-----------------------------------|
-| Google SSO     | `GF_AUTH_*`                       |
-| Email Alerting | `GF_SMTP_*`                       |
-
----
-
----
-
-#### Google SSO Configuration
-
-1. **Register your application with Google**
-
-   Follow Grafana’s official documentation to obtain a **Google Client ID** and **Client Secret**:  
-   👉 [Configure Google Authentication in Grafana](https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/google/)
-
-2. **Create or edit your `.env` file**
-
-   Add the following variables:
-
+#### Google SSO Setup
+1. **Register with Google:** Follow [Grafana's Google Authentication guide](https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/google/)
+2. **Create `.env` file** with:
    ```env
    GOOGLE_CLIENT_ID=your-google-client-id
    GOOGLE_CLIENT_SECRET=your-google-client-secret
+   ```
 
-#### Email Alerting through SMTP
+#### Email Alerting (SMTP)
+1. Configure following [Grafana's email alert documentation](https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/)
+2. For Gmail, see [Google's app password guide](https://support.google.com/mail/answer/185833?hl=en)
+3. Add SMTP credentials to `.env` file
 
-**Follow this Grafana tutorial to configure email alerts**
-Refer to the documentation <a href="https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/"> here</a>. Your SMTP username and from_address will be the email that you want the alerts to be sent from. 
-*Note that this email must have 2FA configured and that SMTP may be disabled if you're using a university email.* Here's <a href="https://support.google.com/mail/answer/185833?hl=en">a guide</a> for how to set up an app password to use with SMTP. Save your SMTP credentials in your .env file.
+> 💡 **Tip:** To disable SSO or email alerting, comment out variables starting with `GF_AUTH_` or `GF_SMTP_` in `grafana.yml`
 
-7. Start the three components of the service with
-`docker-compose`.
-
-```
+### Step 7: Start the Services
+```bash
 docker-compose -f <path-to-opensearch.yml> up -d
 docker-compose -f <path-to-logstash.yml> up -d
 docker-compose -f <path-to-grafana.yml> --env-file .env up -d
 ```
-OPTIONAL: you could also start the opensearch dashboard in the same way.
-```
+
+(Optional) Start OpenSearch Dashboard:
+```bash
 docker-compose -f <path-to-opensearch-dashboard.yml> up -d
 ```
 
-By default, `Logstash` listens for `Filebeat` input at port 9400, `Opensearch`
-listens for `Logstash` input at port 9200, `Grafana` dashboard is hosted at
-port 3000, and the optional `Opensearch` dashboard is hosted at port 5601.
-Make sure the firewall settings allow external traffic to ports 9400, 3000, and
-5601.
+> 💡 **For debugging:** To check Logstash output, run this command after starting the logstash service:
+```bash
+docker logs -f logstash
+```
 
-## Usage
-### Filebeat
-Use the Ansible playbook <a href="https://github.com/UMNET-perfSONAR/ansible-playbook-filebeat">here</a> and follow the instructions to install Filebeat onto a list of probes. Ensure that the machine you clone the Ansible playbook to has SSH access to each probe on the list. The role that this playbook deploys can be found <a href="https://github.com/UMNET-perfSONAR/ansible-role-filebeat">here</a>.
+## 🔌 Default Ports
 
-If any changes need to be made to the Filebeat configuration, edit the Jinja2 template inside the role. This can be accomplished by cloning the role inside the playbook directory and directly editing templates/filebeat.yml.j2, without having to publish the role to Ansible Galaxy.
+| Service | Port | Purpose |
+|---------|------|---------|
+| Logstash | 9400 | Filebeat input |
+| OpenSearch | 9200 | Logstash input |
+| Grafana | 3000 | Web dashboard |
+| OpenSearch Dashboard | 5601 | Web dashboard (optional) |
 
-### logstash.conf
-This file contains the input source, custom filters, and output destination. See the
-sample file for more details. The input and output fields generally require minimal
-changes, if any. Most of the customization is done in the `filter` field. You could
-implement as many filters as you like, and a more complicated filtering at the
-Logstash level usually results in simpler configuration later at the Grafana level.
+> 🔥 **Firewall:** Ensure ports 9400, 3000, and 5601 are open for external traffic.
 
-Ruby scripts for parsing the JSON, converting the durations, and normalizing the endpoints were sourced from <a href="https://github.com/perfsonar/logstash/tree/master/perfsonar-logstash/perfsonar-logstash">here</a>.
+## 📖 Usage Guide
+
+### Filebeat Configuration
+Use the [Ansible playbook](https://github.com/UMNET-perfSONAR/ansible-playbook-filebeat) to install Filebeat on probes. Ensure SSH access from your Ansible control node to all target probes in inventory/hosts.ini
+
+For configuration changes:
+1. Clone the [Ansible role](https://github.com/UMNET-perfSONAR/ansible-role-filebeat) into the playbook directory
+2. Edit `templates/filebeat.yml.j2` directly
+
+### Logstash Configuration (`logstash.conf`)
+Contains input sources, custom filters, and output destinations. Most customization happens in the `filter` section.
+
+Ruby parsing scripts sourced from [perfSONAR logstash repository](https://github.com/perfsonar/logstash/tree/master/perfsonar-logstash/perfsonar-logstash).
 
 ### OpenSearch Dashboard
-While running the optional OpenSearch dashboard, navigate to '<pipeline-hostname>:5601' and sign in when prompted. This documentation uses `admin` as the username and `OpensearchInit2024` as the password for demonstration. The most important functionality of the dashboard is checking the indices that Logstash is generating, as well as the JSON format of the data within each index. To use the dashboard for this purpose, navigate to 'Dev Tools' in the sidebar and type GET <index-name-here>/_search. 
+Access at `<pipeline-hostname>:5601`
+- Default credentials: `admin` / `OpensearchInit2024` (as defined in env variables above)
+- Use Dev Tools to inspect indices and output: `GET <index-name>/_search`
 
-### Grafana
-Navigate to the `Grafana` dashboard at `<pipeline-hostname>:3000`. By default,
-`Grafana` username and password are both `admin`. If you only want to view the dashboard and not edit, and you have Google SSO configured, you can also sign in with your university email. To add a data source, select
-`Opensearch` in the list of available sources and configure as follows.
+### Grafana Setup
+
+#### Access Dashboard
+Navigate to `<pipeline-hostname>:3000`
+- Default credentials: `admin` / `admin`
+- Google SSO available for view-only access (if configured)
+
+#### Add OpenSearch Data Source
+1. Select OpenSearch from available sources
+2. Configure as shown:
+
 <img src="images/add-data-source.png" alt="add-data-source"></img>
-Remarks:
-* `URL`: use https instead of http, and check `Basic auth` and `Skip TLS Verify`
-under the `Auth` section. `User` and `Password` under `Basic Auth Details` are
-`OPENSEARCH_USER` and `OPENSEARCH_PASSWORD` defined earlier, which are `admin` and
-`OpensearchInit2024` in our example. Also make sure to use the Docker aliased
-hostname `opensearch-node1` instead of the actual hostname of your pipeline machine.
-* `Index name`: wild card patterns are allowed here. To see the list of all
-`Opensearch` indices, run
-```
+
+**Configuration details:**
+- **URL:** Use `https://opensearch-node1:9200` (Docker hostname)
+- **Auth:** Enable `Basic auth` and `Skip TLS Verify`
+- **Credentials:** Use your OpenSearch username/password
+- **Index:** Use wildcards (e.g., `pssid-*`)
+
+To list available indices:
+```bash
 curl -u <OPENSEARCH_USER>:<OPENSEARCH_PASSWORD> --insecure \
     "https://localhost:9200/_cat/indices?v"
 ```
-on the pipeline machine.
-* Click on `Get Version and Save`, which should automatically populate the `Version`
-and `Max concurrent Shard Requests` fields, indicating a successful configuration.
 
-Having configured the data sources, now you could create visualization panels and
-dashboards.
+#### Import Dashboard
+1. Navigate to **Dashboards → New → Import**
+2. Drag and drop JSON file from `exported-grafana-json` folder
 
-### Grafana Visualization
-The exported-grafana-json folder contains the exported json for an example Grafana dashboard. To import this dashboard into Grafana, navigate to Dashboards -> New -> Import and drag and drop the JSON file where prompted.
+## 📊 Creating Visualizations
 
-### Queries on Grafana
+After configuring data sources, you can create custom visualization panels and dashboards using Grafana's query builder with your OpenSearch indices.
