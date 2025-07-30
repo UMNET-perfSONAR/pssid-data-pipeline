@@ -101,6 +101,7 @@ sudo sysctl -p
 
 ### Step 7: (Optional) Configure Grafana HTTPs using nginx and Certbot
 > 💡 **Tip:** To disable Grafana HTTPs, remove the nginx and certbot sections under `services` in grafana.yml, and remove `nginx-html` and `certbot-etc` under volumes.
+
 Run nginx:
 ```bash
 docker-compose -f <path-to-grafana>.yml up -d nginx
@@ -121,10 +122,7 @@ After successfully running the command above, delete the grafana.conf file and r
 rm grafana.conf
 mv grafana-https.conf grafana.conf
 ```
-Reload the new config:
-```bash
-docker-compose -f grafana.yml restart nginx
-```
+
 Then run:
 ```bash
 docker exec <nginx-container-name> wget -O /etc/letsencrypt/options-ssl-nginx.conf https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
