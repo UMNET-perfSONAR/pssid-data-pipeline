@@ -77,6 +77,7 @@ sudo sysctl -p
 
 ```yaml
 # TODO: mount your pipeline directory into the container. USE ABSOLUTE PATH!
+# example: /home/uniqname/pssid-data-pipeline/logstash-pipeline
 - <ABS_PATH_TO_YOUR_PIPELINE_DIRECTORY>:/usr/share/logstash/pipeline
 ```
 
@@ -85,16 +86,18 @@ sudo sysctl -p
 
 #### Google SSO Setup
 1. **Register with Google:** Follow [Grafana's Google Authentication guide](https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/google/)
-2. **Create `.env` file** with:
+2. **Create `.env` file** in the same directory as grafana.yml with:
    ```env
    GOOGLE_CLIENT_ID=your-google-client-id
    GOOGLE_CLIENT_SECRET=your-google-client-secret
    ```
-
+   
 #### Email Alerting (SMTP)
 1. Configure following [Grafana's email alert documentation](https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/)
 2. For Gmail, see [Google's app password guide](https://support.google.com/mail/answer/185833?hl=en)
 3. Add SMTP credentials to `.env` file
+   
+> ⚠️ **Note:** If using version control, please use the .env file method and add .env to your .gitignore! Github doesn't allow pushing commits that contain secrets.
 
 ### Step 7: (Optional) Configure Grafana HTTPs using nginx and Certbot
 > 💡 **Tip:** To disable Grafana HTTPs, remove the nginx and certbot sections under `services` in grafana.yml, and remove `nginx-html` and `certbot-etc` under volumes.
@@ -136,7 +139,7 @@ docker-compose -f <path-to-opensearch.yml> up -d
 docker-compose -f <path-to-logstash.yml> up -d
 ```
 If you aren't already running grafana.yml from HTTPs setup above:
-``bash
+```bash
 docker-compose -f <path-to-grafana.yml> --env-file .env up -d
 ```
 
