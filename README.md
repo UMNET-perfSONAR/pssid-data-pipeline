@@ -29,7 +29,7 @@ without touching other components of the pipeline.
 
 ### Step 2: Configure OpenSearch Security
 OpenSearch requires passwords since version 2.12.0. Set up environment variables by adding these lines to your `.bashrc` file (this documentation uses `admin` as the username and `OpensearchInit2024` as the password for demonstration),
-
+`nano ~/.bashrc`
 ```bash
 export OPENSEARCH_HOST=https://opensearch-node1:9200
 export OPENSEARCH_INITIAL_ADMIN_PASSWORD=OpensearchInit2024
