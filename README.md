@@ -112,20 +112,28 @@ docker-compose -f grafana.yml run --rm --entrypoint="" certbot \
 If you're getting the error `Certbot failed to authenticate some domains (authenticator: webroot)`, use `docker ps` to check that your nginx container is running without errors.
 
 After successfully running the command above, delete the grafana.conf file and rename grafana-https.conf to grafana.conf.
-
+```bash
+# From the nginx/conf.d/ directory:
+rm grafana.conf
+mv grafana-https.conf grafana.conf
+```
+Reload the new config:
+```bash
+docker-compose -f grafana.yml restart nginx
+```
 Then run:
 ```bash
-docker exec pssid-data-pipeline_nginx_1 wget -O /etc/letsencrypt/options-ssl-nginx.conf https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
-docker exec pssid-data-pipeline_nginx_1 wget -O /etc/letsencrypt/ssl-dhparams.pem https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
+docker exec <nginx-container-name> wget -O /etc/letsencrypt/options-ssl-nginx.conf https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
+docker exec <nginx-container-name> wget -O /etc/letsencrypt/ssl-dhparams.pem https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
 ```
 
 Test the nginx config:
 ```bash
-docker exec pssid-data-pipeline_nginx_1 nginx -t
+docker exec <nginx-container-name> nginx -t
 ```
 If you see `nginx: configuration file /etc/nginx/nginx.conf test is successful`, then run:
 ```bash
-docker exec pssid-data-pipeline_nginx_1 nginx -s reload
+docker exec <nginx-container-name> nginx -s reload
 ```
 
 Use curl to test HTTPS access:
@@ -137,9 +145,6 @@ curl -I https://<PIPELINE-HOSTNAME>
 ```bash
 docker-compose -f <path-to-opensearch.yml> up -d
 docker-compose -f <path-to-logstash.yml> up -d
-```
-If you aren't already running grafana.yml from HTTPs setup above:
-```bash
 docker-compose -f <path-to-grafana.yml> --env-file .env up -d
 ```
 
@@ -153,7 +158,7 @@ docker-compose -f <path-to-opensearch-dashboard.yml> up -d
 docker logs -f logstash
 ```
 
-> 💡 **Common Error:** When recreating the Grafana container, you might occasionally see `KeyError: 'Container Config'`. To resolve this issue, use `docker ps` and then run `docker rm -f <container-id>` for each container in the list. After starting Grafana, rerun all the commands above to start the services again.
+> 💡 **Common Error:** When restarting the Grafana container, you might occasionally see `KeyError: 'Container Config'`. To resolve this issue, use `docker ps` and then run `docker rm -f <container-id>` for each container in the list. After starting Grafana, rerun all the commands above to start the services again.
 
 ## 🔌 Default Ports
 
