@@ -80,6 +80,7 @@ sudo sysctl -p
 ```
 
 ### Step 6: (Optional) Configure Grafana Authentication and Alerting
+> 💡 **Tip:** To disable SSO or email alerting, comment out variables starting with `GF_AUTH_` or `GF_SMTP_` in `grafana.yml`
 
 #### Google SSO Setup
 1. **Register with Google:** Follow [Grafana's Google Authentication guide](https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/google/)
@@ -94,12 +95,47 @@ sudo sysctl -p
 2. For Gmail, see [Google's app password guide](https://support.google.com/mail/answer/185833?hl=en)
 3. Add SMTP credentials to `.env` file
 
-> 💡 **Tip:** To disable SSO or email alerting, comment out variables starting with `GF_AUTH_` or `GF_SMTP_` in `grafana.yml`
+### Step 7: (Optional) Configure Grafana HTTPs using nginx and Certbot
+> 💡 **Tip:** To disable Grafana HTTPs, remove the nginx and certbot sections under `services` in grafana.yml, and remove `nginx-html` and `certbot-etc` under volumes.
 
-### Step 7: Start the Services
+```bash
+docker-compose -f grafana.yml run --rm --entrypoint="" certbot \
+  certbot certonly --webroot -w /var/www/certbot \
+           -d pssid-metrics.miserver.it.umich.edu \
+           --email YOUR-UNIQNAME@umich.edu --agree-tos --no-eff-email
+```
+
+If you're getting the error `Certbot failed to authenticate some domains (authenticator: webroot)`, use `docker ps` to check that your nginx container is running without errors.
+
+After successfully running the command above, delete the grafana.conf file and rename grafana-https.conf to grafana.conf.
+
+Then run:
+```bash
+docker exec pssid-data-pipeline_nginx_1 wget -O /etc/letsencrypt/options-ssl-nginx.conf https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
+docker exec pssid-data-pipeline_nginx_1 wget -O /etc/letsencrypt/ssl-dhparams.pem https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
+```
+
+Test the nginx config:
+```bash
+docker exec pssid-data-pipeline_nginx_1 nginx -t
+```
+If you see `nginx: configuration file /etc/nginx/nginx.conf test is successful`, then run:
+```bash
+docker exec pssid-data-pipeline_nginx_1 nginx -s reload
+```
+
+Use curl to test HTTPS access:
+```bash
+curl -I https://pssid-metrics.miserver.it.umich.edu
+```
+
+### Step 8: Start the Services
 ```bash
 docker-compose -f <path-to-opensearch.yml> up -d
 docker-compose -f <path-to-logstash.yml> up -d
+```
+If you aren't already running grafana.yml from HTTPs setup above:
+``bash
 docker-compose -f <path-to-grafana.yml> --env-file .env up -d
 ```
 
@@ -112,6 +148,8 @@ docker-compose -f <path-to-opensearch-dashboard.yml> up -d
 ```bash
 docker logs -f logstash
 ```
+
+> 💡 **Common Error:** When recreating the Grafana container, you might occasionally see `KeyError: 'Container Config'`. To resolve this issue, use `docker ps` and then run `docker rm -f <container-id>` for each container in the list. After starting Grafana, rerun all the commands above to start the services again.
 
 ## 🔌 Default Ports
 
@@ -173,5 +211,4 @@ curl -u <OPENSEARCH_USER>:<OPENSEARCH_PASSWORD> --insecure \
 2. Drag and drop JSON file from `exported-grafana-json` folder
 
 ## 📊 Creating Visualizations
-
 After configuring data sources, you can create custom visualization panels and dashboards using Grafana's query builder with your OpenSearch indices.
