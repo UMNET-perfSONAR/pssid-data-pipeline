@@ -101,7 +101,7 @@ sudo sysctl -p
 ```bash
 docker-compose -f grafana.yml run --rm --entrypoint="" certbot \
   certbot certonly --webroot -w /var/www/certbot \
-           -d pssid-metrics.miserver.it.umich.edu \
+           -d <PIPELINE-HOSTNAME> \
            --email YOUR-UNIQNAME@umich.edu --agree-tos --no-eff-email
 ```
 
@@ -126,7 +126,7 @@ docker exec pssid-data-pipeline_nginx_1 nginx -s reload
 
 Use curl to test HTTPS access:
 ```bash
-curl -I https://pssid-metrics.miserver.it.umich.edu
+curl -I https://<PIPELINE-HOSTNAME>
 ```
 
 ### Step 8: Start the Services
@@ -184,7 +184,8 @@ Access at `<pipeline-hostname>:5601`
 ### Grafana Setup
 
 #### Access Dashboard
-Navigate to `<pipeline-hostname>:3000`
+If HTTPs configured: Navigate to `https://<pipeline-hostname>/`
+If HTTPS not configured: Navigate to `<pipeline-hostname>:3000`
 - Default credentials: `admin` / `admin`
 - Google SSO available for view-only access (if configured)
 
