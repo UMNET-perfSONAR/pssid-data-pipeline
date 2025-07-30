@@ -1,13 +1,12 @@
-version: '3'
+version: "3"
 
 services:
   grafana:
     image: grafana/grafana-enterprise
     container_name: grafana
-    ports:
-      - 3000:3000
     environment:
-      - GF_INSTALL_PLUGINS=grafana-opensearch-datasource,esnet-matrix-panel
+      - GF_INSTALL_PLUGINS=grafana-opensearch-datasource
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=esnet-matrix-panel
       - GF_AUTH_GOOGLE_ENABLED=true
       - GF_AUTH_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GF_AUTH_GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -21,21 +20,50 @@ services:
       - GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
       - GF_SMTP_FROM_ADDRESS=${GF_SMTP_USER}
       - GF_SMTP_FROM_NAME=Grafana
-
-      - GF_SERVER_ROOT_URL=http://pssid-metrics.miserver.it.umich.edu:3000
-
+      - GF_SERVER_ROOT_URL=https://pssid-metrics.miserver.it.umich.edu
     volumes:
       - grafana-data:/var/lib/grafana
       - /etc/grafana/saml:/etc/grafana/saml
+      - ./plugins/esnet-matrix-panel:/var/lib/grafana/plugins/esnet-matrix-panel
+    networks: [frontend]
+    restart: always
 
-    networks:
-      - opensearch-net
+  # the below is for HTTPS with certbot
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - nginx-html:/var/www/certbot          # ACME webroot
+      - certbot-etc:/etc/letsencrypt         # live certs
+    ports:
+      - "80:80"     # ACME HTTP‑01 challenge
+      - "443:443"   # HTTPS for users
+    depends_on: [grafana]
+    networks: [frontend]
+    restart: always
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - nginx-html:/var/www/certbot
+      - certbot-etc:/etc/letsencrypt
+    entrypoint: >
+      sh -c "trap exit TERM;
+             while :; do
+               certbot renew --webroot -w /var/www/certbot --quiet;
+               nginx -s reload 2>/dev/null || true;
+               sleep 12h & wait $${!};
+             done"
+    networks: [frontend]
+    depends_on: [nginx]              # renewals need nginx running
     restart: always
 
 volumes:
   grafana-data:
+  nginx-html:
+  certbot-etc:
 
 networks:
-  opensearch-net:
+  frontend:
     external:
       name: pssid-data-pipeline_opensearch-net
