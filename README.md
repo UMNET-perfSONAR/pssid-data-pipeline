@@ -101,9 +101,13 @@ sudo sysctl -p
 
 ### Step 7: (Optional) Configure Grafana HTTPs using nginx and Certbot
 > 💡 **Tip:** To disable Grafana HTTPs, remove the nginx and certbot sections under `services` in grafana.yml, and remove `nginx-html` and `certbot-etc` under volumes.
-
+Run nginx:
 ```bash
-docker-compose -f grafana.yml run --rm --entrypoint="" certbot \
+docker-compose -f <path-to-grafana>.yml up -d nginx
+```
+Then run certbot to generate certificates:
+```bash
+docker-compose -f <path-to-grafana>.yml run --rm --entrypoint="" certbot \
   certbot certonly --webroot -w /var/www/certbot \
            -d <PIPELINE-HOSTNAME> \
            --email YOUR-UNIQNAME@umich.edu --agree-tos --no-eff-email
@@ -167,9 +171,14 @@ docker logs -f logstash
 | Logstash | 9400 | Filebeat input |
 | OpenSearch | 9200 | Logstash input |
 | Grafana | 3000 | Web dashboard |
+| Nginx | 80 | HTTP (ACME challenges + HTTPS redirects) |
+| Nginx | 443 | HTTPS (secure web dashboard) |
 | OpenSearch Dashboard | 5601 | Web dashboard (optional) |
 
-> 🔥 **Firewall:** Ensure ports 9400, 3000, and 5601 are open for external traffic.
+> 🔥 **Firewall:**
+> - **If with HTTPS:** Ensure ports 80, 443, 9400, and 5601 are open for external traffic
+> - **If without HTTPS:** Ensure ports 9400, 3000, and 5601 are open for external traffic
+> - **Note:** Port 9200 is for internal container communication only
 
 ## 📖 Usage Guide
 
