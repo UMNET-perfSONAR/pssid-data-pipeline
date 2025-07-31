@@ -29,7 +29,7 @@ without touching other components of the pipeline.
 
 ### Step 2: Configure OpenSearch Security
 OpenSearch requires passwords since version 2.12.0. Set up environment variables by adding these lines to your `.bashrc` file (this documentation uses `admin` as the username and `OpensearchInit2024` as the password for demonstration),
-`nano ~/.bashrc`
+`nano ~/.bashrc`.
 ```bash
 export OPENSEARCH_HOST=https://opensearch-node1:9200
 export OPENSEARCH_INITIAL_ADMIN_PASSWORD=OpensearchInit2024
@@ -71,9 +71,8 @@ sudo sysctl -p
 ```
 
 ### Step 5: Configure Logstash
-1. Create a `logstash-pipeline` directory with a `logstash.conf` file
-2. Use the provided sample configuration in the `logstash-pipeline` directory as a starting point
-3. Edit `logstash.yml` to mount your pipeline directory:
+1. Use the provided logstash.conf in the `logstash-pipeline` directory of this repository as a starting point. You can revise this file later to meet your testing needs.
+2. Edit `logstash.yml` to mount your pipeline directory:
 
 ```yaml
 # TODO: mount your pipeline directory into the container. USE ABSOLUTE PATH!
@@ -100,15 +99,17 @@ sudo sysctl -p
 > ⚠️ **Note:** If using version control, please use the .env file method and add .env to your .gitignore! Github doesn't allow pushing commits that contain secrets.
 
 ### Step 7: (Optional) Configure Grafana HTTPs using nginx and Certbot
-> 💡 **Tip:** To disable Grafana HTTPs, remove the nginx and certbot sections under `services` in grafana.yml, and remove `nginx-html` and `certbot-etc` under volumes.
+> 💡 **Tip:** To disable Grafana HTTPs, remove the nginx and certbot sections under `services` in the cloned grafana.yml, and remove `nginx-html` and `certbot-etc` under volumes.
 
 Run nginx:
 ```bash
-docker-compose -f <path-to-grafana>.yml up -d nginx
+# From your cloned repository's directory:
+docker-compose -f grafana.yml up -d nginx
 ```
 Then run certbot to generate certificates:
 ```bash
-docker-compose -f <path-to-grafana>.yml run --rm --entrypoint="" certbot \
+# From your cloned repository's directory:
+docker-compose -f grafana.yml run --rm --entrypoint="" certbot \
   certbot certonly --webroot -w /var/www/certbot \
            -d <PIPELINE-HOSTNAME> \
            --email YOUR-UNIQNAME@umich.edu --agree-tos --no-eff-email
@@ -116,43 +117,49 @@ docker-compose -f <path-to-grafana>.yml run --rm --entrypoint="" certbot \
 
 If you're getting the error `Certbot failed to authenticate some domains (authenticator: webroot)`, use `docker ps` to check that your nginx container is running without errors.
 
-After successfully running the command above, delete the grafana.conf file and rename grafana-https.conf to grafana.conf.
+After successfully running the command above, rename the grafana.conf file to grafana.conf.old and rename grafana-https.conf to grafana.conf.
 ```bash
 # From the nginx/conf.d/ directory:
-rm grafana.conf
+mv grafana.conf grafana.conf.old
 mv grafana-https.conf grafana.conf
 ```
 
 Then run:
 ```bash
+# From your cloned repository's directory:
 docker exec <nginx-container-name> wget -O /etc/letsencrypt/options-ssl-nginx.conf https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
 docker exec <nginx-container-name> wget -O /etc/letsencrypt/ssl-dhparams.pem https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
 ```
+> 💡 **Tip:** To check what your nginx container name is, try running docker ps | grep nginx
 
 Test the nginx config:
 ```bash
+# From your cloned repository's directory:
 docker exec <nginx-container-name> nginx -t
 ```
 If you see `nginx: configuration file /etc/nginx/nginx.conf test is successful`, then run:
 ```bash
+# From your cloned repository's directory:
 docker exec <nginx-container-name> nginx -s reload
 ```
 
 Use curl to test HTTPS access:
 ```bash
+# From your cloned repository's directory:
 curl -I https://<PIPELINE-HOSTNAME>
 ```
 
 ### Step 8: Start the Services
 ```bash
-docker-compose -f <path-to-opensearch.yml> up -d
-docker-compose -f <path-to-logstash.yml> up -d
-docker-compose -f <path-to-grafana.yml> --env-file .env up -d
+# From your cloned repository's directory:
+docker-compose -f opensearch-one-node.yml up -d
+docker-compose -f logstash.yml up -d
+docker-compose -f grafana.yml --env-file .env up -d
 ```
 
 (Optional) Start OpenSearch Dashboard:
 ```bash
-docker-compose -f <path-to-opensearch-dashboard.yml> up -d
+docker-compose -f opensearch-dashboard.yml up -d
 ```
 
 > 💡 **For debugging:** To check Logstash output, run this command after starting the logstash service:
@@ -196,7 +203,8 @@ Ruby parsing scripts sourced from [perfSONAR logstash repository](https://github
 Access at `<pipeline-hostname>:5601`
 - Default credentials: `admin` / `OpensearchInit2024` (as defined in env variables above)
 - Use Dev Tools to inspect indices and output: `GET <index-name>/_search`
-
+- Use Dev Tools to delete indices from old probes that are no longer sending data: `DELETE pscheduler_*_<probe-name>_*` (this command may need to be adjusted if you change the index naming scheme specified in the output field of Logstash)
+  
 ### Grafana Setup
 
 #### Access Dashboard
@@ -219,9 +227,11 @@ If HTTPS not configured: Navigate to `<pipeline-hostname>:3000`
 
 To list available indices:
 ```bash
+# From your cloned repository's directory:
 curl -u <OPENSEARCH_USER>:<OPENSEARCH_PASSWORD> --insecure \
     "https://localhost:9200/_cat/indices?v"
 ```
+Or you can use Dev Tools on OpenSearch Dashboard to check.
 
 #### Import Dashboard
 1. Navigate to **Dashboards → New → Import**
