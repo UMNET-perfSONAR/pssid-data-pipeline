@@ -20,6 +20,17 @@ A data analytics pipeline for pSSID that receives, stores, and visualizes WiFi t
 ```bash
 sudo apt update && sudo apt install docker.io docker-compose -y
 ```
+Verify your Docker installation:
+```bash
+docker run hello-world
+```
+You might need to start Docker (this will also make it automatically run on system boot):
+```bash
+sudo systemctl enable --now docker
+```
+If this Docker installation doesn't work, try referencing the [official Docker install documentation](https://docs.docker.com/engine/install/ubuntu/) and follow their steps to install Docker Engine.
+
+> 💡 **Tip:** If installing Docker using the official documentation, change all instances of "docker-compose" in the commands below to "docker compose" when running commands.
 
 ## 🚀 Installation
 
@@ -49,7 +60,10 @@ Add your user to the docker group to avoid using `sudo` (since the root user can
 ```bash
 sudo usermod -aG docker ${USER} && newgrp docker
 ```
-
+Ensure that Docker is working without root:
+```bash
+docker run hello-world
+```
 > ⚠️ **Important:** Running with `sudo` prevents access to user environment variables.
 
 ### Step 4: Set System Requirements
@@ -60,7 +74,7 @@ Check current value:
 sysctl vm.max_map_count
 ```
 
-If it's too low, edit `/etc/sysctl.conf` and add:
+If it's too low, edit `/etc/sysctl.conf` as sudo and add:
 ```
 vm.max_map_count=262144
 ```
@@ -72,11 +86,11 @@ sudo sysctl -p
 
 ### Step 5: Configure Logstash
 1. Use the provided logstash.conf in the `logstash-pipeline` directory of this repository as a starting point. You can revise this file later to meet your testing needs.
-2. Edit `logstash.yml` to mount your pipeline directory:
+2. Edit `logstash.yml` (from the root of the cloned repo) to mount your pipeline directory:
 
 ```yaml
 # TODO: mount your pipeline directory into the container. USE ABSOLUTE PATH!
-# example: /home/uniqname/pssid-data-pipeline/logstash-pipeline
+# abs path example: /home/uniqname/pssid-data-pipeline/logstash-pipeline
 - <ABS_PATH_TO_YOUR_PIPELINE_DIRECTORY>:/usr/share/logstash/pipeline
 ```
 
@@ -100,8 +114,26 @@ sudo sysctl -p
 
 ### Step 7: (Optional) Configure Grafana HTTPs using nginx and Certbot
 > 💡 **Tip:** To disable Grafana HTTPs, remove the nginx and certbot sections under `services` in the cloned grafana.yml, and remove `nginx-html` and `certbot-etc` under volumes.
+Before you start, open nginx/conf.d/grafana.conf and make the following edits:
+```conf
+server_name <YOUR-PIPELINE-HOSTNAME-HERE>;
+```
+Then, open nginx/conf.d/grafana.conf.https and make the following edits:
+```conf
+server_name <YOUR-PIPELINE-HOSTNAME-HERE>;
+...
+server_name <YOUR-PIPELINE-HOSTNAME-HERE>;
+ssl_certificate     /etc/letsencrypt/live/<YOUR-PIPELINE-HOSTNAME-HERE>/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/<YOUR-PIPELINE-HOSTNAME-HERE>/privkey.pem;
+```
 
-Run nginx:
+If this is your *first* time running grafana.yml, run this command to create the network:
+```bash
+# From your cloned repository's directory:
+docker network create pssid-data-pipeline_opensearch-net
+```
+
+After that, you can run nginx:
 ```bash
 # From your cloned repository's directory:
 docker-compose -f grafana.yml up -d nginx
@@ -115,13 +147,13 @@ docker-compose -f grafana.yml run --rm --entrypoint="" certbot \
            --email YOUR-UNIQNAME@umich.edu --agree-tos --no-eff-email
 ```
 
-If you're getting the error `Certbot failed to authenticate some domains (authenticator: webroot)`, use `docker ps` to check that your nginx container is running without errors.
+If you're getting the error `Certbot failed to authenticate some domains (authenticator: webroot)`, use `docker ps` to check that your nginx container is running without errors. You can troubleshoot using `docker logs -f <nginx-container-id>`.
 
-After successfully running the command above, rename the grafana.conf file to grafana.conf.old and rename grafana-https.conf to grafana.conf.
+After successfully running the command above, rename the grafana.conf file to grafana.conf.old and rename grafana.conf.https to grafana.conf.
 ```bash
-# From the nginx/conf.d/ directory:
-mv grafana.conf grafana.conf.old
-mv grafana-https.conf grafana.conf
+# From your cloned repository's directory:
+mv nginx/conf.d/grafana.conf nginx/conf.d/grafana.conf.old
+mv nginx/conf.d/grafana.conf.https nginx/conf.d/grafana.conf
 ```
 
 Then run:
@@ -130,9 +162,14 @@ Then run:
 docker exec <nginx-container-name> wget -O /etc/letsencrypt/options-ssl-nginx.conf https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
 docker exec <nginx-container-name> wget -O /etc/letsencrypt/ssl-dhparams.pem https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem
 ```
-> 💡 **Tip:** To check what your nginx container name is, try running docker ps | grep nginx
+> 💡 **Tip:** To check what your nginx container name is, try running docker ps | grep nginx, it'll be the last item listed in the row.
 
-Test the nginx config:
+Verify that the certificate and key files are in the right place:
+```bash
+docker exec -it pssid-data-pipeline-nginx-1 \
+       ls -l /etc/letsencrypt/live/<PIPELINE-HOSTNAME>
+```
+If that returns a list of .pem files, go ahead and test the nginx config:
 ```bash
 # From your cloned repository's directory:
 docker exec <nginx-container-name> nginx -t
@@ -148,12 +185,20 @@ Use curl to test HTTPS access:
 # From your cloned repository's directory:
 curl -I https://<PIPELINE-HOSTNAME>
 ```
+Or navigate to https://<PIPELINE-HOSTNAME> in a web browser and it should redirect you to Grafana's login page.
 
 ### Step 8: Start the Services
+> 💡 **Before running grafana:** If this is your *first* time running grafana.yml (having skipped the HTTPS setup step), then create the network before running Grafana:
+```bash
+# From your cloned repository's directory:
+docker network create pssid-data-pipeline_opensearch-net
+```
+Bring up OpenSearch, Logstash, and Grafana:
 ```bash
 # From your cloned repository's directory:
 docker-compose -f opensearch-one-node.yml up -d
 docker-compose -f logstash.yml up -d
+# only run grafana if you aren't already running it from the HTTPS setup step
 docker-compose -f grafana.yml --env-file .env up -d
 ```
 
@@ -192,7 +237,13 @@ Use the [Ansible playbook](https://github.com/UMNET-perfSONAR/ansible-playbook-f
 
 For configuration changes:
 1. Clone the [Ansible role](https://github.com/UMNET-perfSONAR/ansible-role-filebeat) into the playbook directory
-2. Edit `templates/filebeat.yml.j2` directly
+2. Edit `defaults/main.yml`:
+```yaml
+# add your pipeline hostname under this list variable
+# you can add multiple hosts
+filebeat_output_logstash_hosts:
+  - "<PIPELINE-HOSTNAME>:9400"
+```
 
 ### Logstash Configuration (`logstash.conf`)
 Contains input sources, custom filters, and output destinations. Most customization happens in the `filter` section.
