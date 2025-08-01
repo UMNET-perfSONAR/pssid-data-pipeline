@@ -28,7 +28,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -47,7 +47,7 @@
     {
       "datasource": {
         "type": "grafana-opensearch-datasource",
-        "uid": "cepck5jtcc45cc"
+        "uid": "aetnpntfjsmioa"
       },
       "description": "",
       "fieldConfig": {
@@ -58,7 +58,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "yellow",
@@ -72,7 +73,19 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sec_time_since"
+            },
+            "properties": [
+              {
+                "id": "displayName"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -98,7 +111,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.2.0-16636675413",
       "targets": [
         {
           "alias": "",
@@ -183,7 +196,7 @@
     {
       "datasource": {
         "type": "grafana-opensearch-datasource",
-        "uid": "cepck5jtcc45cc"
+        "uid": "aetnpntfjsmioa"
       },
       "description": "",
       "fieldConfig": {
@@ -204,7 +217,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "dark-yellow",
@@ -303,10 +317,11 @@
           "id": "fit",
           "lat": 0,
           "lon": 0,
+          "noRepeat": false,
           "zoom": 13.5
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.2.0-16636675413",
       "targets": [
         {
           "alias": "",
@@ -353,7 +368,7 @@
     {
       "datasource": {
         "type": "grafana-opensearch-datasource",
-        "uid": "cepck5jtcc45cc"
+        "uid": "aetnpntfjsmioa"
       },
       "description": "dest: $destination",
       "fieldConfig": {
@@ -399,7 +414,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -431,7 +447,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.2.0-16636675413",
       "repeat": "host",
       "repeatDirection": "h",
       "targets": [
@@ -492,7 +508,7 @@
     {
       "datasource": {
         "type": "grafana-opensearch-datasource",
-        "uid": "cepck5jtcc45cc"
+        "uid": "aetnpntfjsmioa"
       },
       "fieldConfig": {
         "defaults": {
@@ -537,7 +553,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -569,7 +586,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.2.0-16636675413",
       "repeat": "host",
       "repeatDirection": "h",
       "targets": [
@@ -618,7 +635,7 @@
     {
       "datasource": {
         "type": "grafana-opensearch-datasource",
-        "uid": "cepck5jtcc45cc"
+        "uid": "aetnpntfjsmioa"
       },
       "fieldConfig": {
         "defaults": {
@@ -663,7 +680,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               }
             ]
           }
@@ -691,7 +709,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.2.0-16636675413",
       "repeat": "host",
       "repeatDirection": "h",
       "targets": [
@@ -740,7 +758,7 @@
     {
       "datasource": {
         "type": "grafana-opensearch-datasource",
-        "uid": "cepck5jtcc45cc"
+        "uid": "aetnpntfjsmioa"
       },
       "fieldConfig": {
         "defaults": {
@@ -785,7 +803,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -817,7 +836,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.2.0-16636675413",
       "repeat": "host",
       "repeatDirection": "h",
       "targets": [
@@ -853,32 +872,24 @@
     {
       "datasource": {
         "type": "grafana-opensearch-datasource",
-        "uid": "cepck5jtcc45cc"
+        "uid": "aetnpntfjsmioa"
       },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "fixedColor": "blue",
-            "mode": "thresholds"
-          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
-              },
-              {
-                "color": "#EAB839",
-                "value": 1
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
-                "value": 3
+                "value": 80
               }
             ]
-          },
-          "unit": "s"
+          }
         },
         "overrides": []
       },
@@ -959,7 +970,7 @@
     {
       "datasource": {
         "type": "grafana-opensearch-datasource",
-        "uid": "cepck5jtcc45cc"
+        "uid": "aetnpntfjsmioa"
       },
       "fieldConfig": {
         "defaults": {
@@ -1004,7 +1015,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -1036,7 +1048,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.2.0-16636675413",
       "repeat": "host",
       "repeatDirection": "h",
       "targets": [
@@ -1085,7 +1097,7 @@
     {
       "datasource": {
         "type": "grafana-opensearch-datasource",
-        "uid": "cepck5jtcc45cc"
+        "uid": "aetnpntfjsmioa"
       },
       "fieldConfig": {
         "defaults": {
@@ -1130,7 +1142,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": 0
               },
               {
                 "color": "red",
@@ -1162,7 +1175,7 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.0.1+security-01",
+      "pluginVersion": "12.2.0-16636675413",
       "repeat": "host",
       "repeatDirection": "h",
       "targets": [
@@ -1196,7 +1209,7 @@
       "type": "timeseries"
     }
   ],
-  "preload": false,
+  "preload": true,
   "refresh": "5m",
   "schemaVersion": 41,
   "tags": [],
@@ -1311,5 +1324,5 @@
   "timezone": "browser",
   "title": "ITS network infra",
   "uid": "627ffd5d-1072-4916-b11f-9a44d0f0277e",
-  "version": 108
+  "version": 15
 }
