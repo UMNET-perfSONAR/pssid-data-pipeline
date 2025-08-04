@@ -22,7 +22,7 @@ sudo apt update && sudo apt install docker.io docker-compose -y
 ```
 Verify your Docker installation:
 ```bash
-docker run hello-world
+sudo docker run hello-world
 ```
 You might need to start Docker (this will also make it automatically run on system boot):
 ```bash
@@ -30,7 +30,7 @@ sudo systemctl enable --now docker
 ```
 If this Docker installation doesn't work, try referencing the [official Docker install documentation](https://docs.docker.com/engine/install/ubuntu/) and follow their steps to install Docker Engine.
 
-> 💡 **Tip:** If installing Docker using the official documentation, change all instances of "docker-compose" in the commands below to "docker compose" when running commands.
+> ⚠️ **Important:** If installing Docker using the official documentation, change all instances of "docker-compose" in the commands below to "docker compose" when running commands.
 
 ## 🚀 Installation
 
