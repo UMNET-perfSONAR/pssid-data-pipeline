@@ -17,9 +17,8 @@ A data analytics pipeline for pSSID that receives, stores, and visualizes WiFi t
 - Docker and Docker Compose installed
 
 ### Installing Docker (if needed)
-```bash
-sudo apt update && sudo apt install docker.io docker-compose -y
-```
+Reference the [official Docker install documentation](https://docs.docker.com/engine/install/ubuntu/) and follow their steps to install Docker Engine.
+
 Verify your Docker installation:
 ```bash
 sudo docker run hello-world
@@ -28,9 +27,6 @@ You might need to start Docker (this will also make it automatically run on syst
 ```bash
 sudo systemctl enable --now docker
 ```
-If this Docker installation doesn't work, try referencing the [official Docker install documentation](https://docs.docker.com/engine/install/ubuntu/) and follow their steps to install Docker Engine.
-
-> ⚠️ **Important:** If installing Docker using the official documentation, change all instances of "docker-compose" in the commands below to "docker compose" when running commands.
 
 ## 🚀 Installation
 
@@ -141,12 +137,12 @@ docker network create pssid-data-pipeline_opensearch-net
 After that, you can run nginx:
 ```bash
 # From your cloned repository's directory:
-docker-compose -f grafana.yml up -d nginx
+docker compose -f grafana.yml up -d nginx
 ```
 Then run certbot to generate certificates:
 ```bash
 # From your cloned repository's directory:
-docker-compose -f grafana.yml run --rm --entrypoint="" certbot \
+docker compose -f grafana.yml run --rm --entrypoint="" certbot \
   certbot certonly --webroot -w /var/www/certbot \
            -d <PIPELINE-HOSTNAME> \
            --email YOUR-UNIQNAME@umich.edu --agree-tos --no-eff-email
@@ -209,12 +205,11 @@ sudo chmod -R 755 ./plugins
 Bring up OpenSearch, Logstash, and Grafana:
 ```bash
 # From your cloned repository's directory:
-docker-compose -f opensearch-one-node.yml up -d
-docker-compose -f logstash.yml up -d
+docker compose -f opensearch-one-node.yml up -d
+docker compose -f logstash.yml up -d
 
-# Only run grafana if you aren't already running it from the HTTPS setup step
 # Run this if you had set up SMTP or SSO for Grafana:
-docker-compose -f grafana.yml --env-file .env up -d
+docker compose -f grafana.yml --env-file .env up -d
 
 # Otherwise, run this:
 docker compose -f grafana.yml up -d
@@ -222,7 +217,7 @@ docker compose -f grafana.yml up -d
 
 (Optional) Start OpenSearch Dashboard:
 ```bash
-docker-compose -f opensearch-dashboard.yml up -d
+docker compose -f opensearch-dashboard.yml up -d
 ```
 
 > 💡 **For debugging:** To check Logstash output, run this command after starting the logstash service:
@@ -273,6 +268,7 @@ Access at `<pipeline-hostname>:5601`
 - Default credentials: `admin` / `OpensearchInit2024` (as defined in env variables above)
 - Use Dev Tools to inspect indices and output: `GET <index-name>/_search`
 - Use Dev Tools to delete indices from old probes that are no longer sending data: `DELETE pscheduler_*_<probe-name>_*` (this command may need to be adjusted if you change the index naming scheme specified in the output field of Logstash)
+- Use this [Index State Management](https://docs.opensearch.org/latest/im-plugin/ism/index/) guide to configure policies that manage your indices (for example, creating a policy to delete an index that hasn't been updated for a few days)
   
 ### Grafana Setup
 
