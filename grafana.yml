@@ -20,7 +20,7 @@ services:
       - GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
       - GF_SMTP_FROM_ADDRESS=${GF_SMTP_USER}
       - GF_SMTP_FROM_NAME=Grafana
-      - GF_SERVER_ROOT_URL=https://pssid-metrics.miserver.it.umich.edu
+      - GF_SERVER_ROOT_URL=https://<YOUR-PIPELINE-HOSTNAME>
     volumes:
       - grafana-data:/var/lib/grafana
       - grafana-plugins:/var/lib/grafana/plugins
