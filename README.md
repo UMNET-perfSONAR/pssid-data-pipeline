@@ -21,10 +21,12 @@ Reference the [official Docker install documentation](https://docs.docker.com/en
 
 Verify your Docker installation:
 ```bash
+# in home directory
 sudo docker run hello-world
 ```
 You might need to start Docker (this will also make it automatically run on system boot):
 ```bash
+# in home directory
 sudo systemctl enable --now docker
 ```
 
