@@ -39,3 +39,4 @@ networks:
   opensearch-net:
     external:
       name: pssid-data-pipeline_opensearch-net
+      
