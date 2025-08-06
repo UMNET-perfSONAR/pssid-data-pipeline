@@ -167,7 +167,7 @@ docker exec <nginx-container-name> wget -O /etc/letsencrypt/ssl-dhparams.pem htt
 
 Verify that the certificate and key files are in the right place:
 ```bash
-docker exec -it pssid-data-pipeline-nginx-1 \
+docker exec -it <nginx-container-name> \
        ls -l /etc/letsencrypt/live/<PIPELINE-HOSTNAME>
 ```
 If that returns a list of .pem files, go ahead and test the nginx config:
@@ -268,7 +268,7 @@ Access at `<pipeline-hostname>:5601`
 - Default credentials: `admin` / `OpensearchInit2024` (as defined in env variables above)
 - Use Dev Tools to inspect indices and output: `GET <index-name>/_search`
 - Use Dev Tools to delete indices from old probes that are no longer sending data: `DELETE pscheduler_*_<probe-name>_*` (this command may need to be adjusted if you change the index naming scheme specified in the output field of Logstash)
-- Use this [Index State Management](https://docs.opensearch.org/latest/im-plugin/ism/index/) guide to configure policies that manage your indices (for example, creating a policy to delete an index that hasn't been updated for a few days)
+- Use this [Index State Management](https://docs.opensearch.org/latest/im-plugin/ism/index/) guide to configure custom policies that manage your indices (for example, creating a policy to delete an index that hasn't been updated for a few days). 
   
 ### Grafana Setup
 
@@ -305,4 +305,4 @@ Or you can use Dev Tools on OpenSearch Dashboard to check. This repository's pro
 
 ## 📊 Creating Visualizations
 After configuring data sources, you can create custom visualization panels and dashboards using Grafana's query builder with your OpenSearch indices.
-> ⚠️ **Note:** After each time you restart Grafana on Docker, you may have to manually refresh each panel by clicking 'Edit' and then 'Refresh'; the mass-refresh button on Grafana seemingly only works after this first manual refresh.
+> ⚠️ **Note:** After each time you start OpenSearch on Docker, you have to manually refresh each panel in Grafana by clicking 'Edit' and then 'Refresh'; the mass-refresh button on Grafana only works after this first manual refresh. This is because the id of the datasource gets changed, and manually refreshing the panel is updates it.
