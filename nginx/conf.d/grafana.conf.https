@@ -1,7 +1,7 @@
 ## 1) Plain‑HTTP server – handles ACME challenge & redirects users
 server {
     listen 80;
-    server_name pssid-metrics.miserver.it.umich.edu;
+    server_name <YOUR-PIPELINE-HOSTNAME>;
 
     root /var/www/certbot;
     location /.well-known/acme-challenge/ { allow all; }
@@ -13,10 +13,10 @@ server {
 server {
     listen 443 ssl;
     http2 on;
-    server_name pssid-metrics.miserver.it.umich.edu;
+    server_name <YOUR-PIPELINE-HOSTNAME>;
 
-    ssl_certificate     /etc/letsencrypt/live/pssid-metrics.miserver.it.umich.edu/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/pssid-metrics.miserver.it.umich.edu/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/<YOUR-PIPELINE-HOSTNAME>/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/<YOUR-PIPELINE-HOSTNAME>/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
