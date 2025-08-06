@@ -23,8 +23,7 @@ services:
       - GF_SERVER_ROOT_URL=https://pssid-metrics.miserver.it.umich.edu
     volumes:
       - grafana-data:/var/lib/grafana
-      - /etc/grafana/saml:/etc/grafana/saml
-      - ./plugins/esnet-matrix-panel:/var/lib/grafana/plugins/esnet-matrix-panel
+      - grafana-plugins:/var/lib/grafana/plugins
     networks: [frontend]
     restart: always
 
@@ -62,6 +61,7 @@ volumes:
   grafana-data:
   nginx-html:
   certbot-etc:
+  grafana-plugins:
 
 networks:
   frontend:
